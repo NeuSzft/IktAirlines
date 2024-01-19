@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  api-build:
+    container_name: airport-api-build
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:8.0
+        COPY ./Airport/AirportLib /build/AirportLib
+        COPY ./Airport/AirportAPI /build/AirportAPI
+        WORKDIR /build/AirportAPI
+        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+    volumes:
+      - api-app:/app
+
+  api:
+    container_name: airport-api
+    depends_on:
+      api-build:
+        condition: service_completed_successfully
+    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    volumes:
+      - api-app:/app
+    working_dir: /app
+    ports:
+      - 5000:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    entrypoint: "./AirportAPI"
+
+volumes:
+  api-app:
+    name: airport-api-app
