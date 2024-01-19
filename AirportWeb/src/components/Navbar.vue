@@ -13,6 +13,9 @@
                     <li class="nav-item">
                         <router-link to="/booking" aria-current="page" class="nav-link active">Booking</router-link>
                     </li>
+                    <li class="nav-item">
+                        <router-link to="/summary" aria-current="page" class="nav-link active">Summary</router-link>
+                    </li>
                 </ul>
             </div>
         </div>
