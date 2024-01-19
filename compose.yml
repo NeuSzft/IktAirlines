@@ -28,6 +28,29 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     entrypoint: "./AirportAPI"
 
+  web-build:
+    container_name: airport-web-build
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - ./AirportWeb:/app
+      - web-app:/app/dist
+    command: >
+      bash -c "npm update &&
+               npm run build"
+
+  web:
+    container_name: airport-web
+    image: httpd:latest
+    volumes:
+      - web-app:/usr/local/apache2/htdocs/
+    ports:
+      - "8080:80"
+    depends_on:
+      - web-build
+
 volumes:
   api-app:
     name: airport-api-app
+  web-app:
+    name: airport-web-app
