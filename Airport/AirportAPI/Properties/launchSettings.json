@@ -6,7 +6,8 @@
       "dotnetRunMessages": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "PORT": "5000"
+        "CONNECTION_STRING": "Host=localhost;Database=airport;Username=postgres;Password=postgres",
+        "PORT": "5555"
       }
     }
   }
