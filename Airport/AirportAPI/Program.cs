@@ -31,11 +31,14 @@ internal static class Program {
 
         builder.WebHost.UseUrls("http://0.0.0.0:" + Environment.GetEnvironmentVariable(PortEnv) ?? "80");
 
+        builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton(_ => connection);
 
         WebApplication app = builder.Build();
+
+        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetIsOriginAllowed(_ => true));
 
         if (app.Environment.IsDevelopment()) {
             app.UseSwagger(options => options.RouteTemplate = "/docs/{documentName}/swagger.json");
