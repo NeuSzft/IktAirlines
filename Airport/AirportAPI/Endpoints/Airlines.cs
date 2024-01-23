@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace AirportAPI.Endpoints;
 
 public static class Airlines {
-    public static IEnumerable<dynamic> GetAirlines(DatabaseConnection db) {
+    public static IEnumerable<Models.Airline> GetAirlines(DatabaseConnection db) {
         string query = """
                 SELECT *
                 FROM airlines
@@ -15,10 +15,10 @@ public static class Airlines {
             """;
 
         using var con = db.Open();
-        return con.Query(query);
+        return con.Query<Models.Airline>(query);
     }
 
-    public static IEnumerable<dynamic> GetAirline(DatabaseConnection db, int id) {
+    public static IEnumerable<Models.Airline> GetAirline(DatabaseConnection db, int id) {
         string query = """
                 SELECT name
                 FROM airlines
@@ -26,7 +26,7 @@ public static class Airlines {
             """;
 
         using var con = db.Open();
-        return con.Query(query, new { Id = id });
+        return con.Query<Models.Airline>(query, new { Id = id });
     }
 
     public static void MapAirlines(this WebApplication app) {

@@ -7,7 +7,18 @@ using System.Collections.Generic;
 namespace AirportAPI.Endpoints;
 
 public static class Flights {
-    public static IEnumerable<dynamic> GetFlights(DatabaseConnection db) {
+    public static IEnumerable<Models.Flight> GetFlights(DatabaseConnection db) {
+        string query = """
+                SELECT *
+                FROM flights
+                ORDER BY id;
+            """;
+
+        using var con = db.Open();
+        return con.Query<Models.Flight>(query);
+    }
+
+    public static IEnumerable<Models.FlightJoined> GetFlightsJoined(DatabaseConnection db) {
         string query = """
                 SELECT
                     flights.id          AS "id",
@@ -28,10 +39,21 @@ public static class Flights {
             """;
 
         using var con = db.Open();
-        return con.Query(query);
+        return con.Query<Models.FlightJoined>(query);
     }
 
-    public static IEnumerable<dynamic> GetFlight(DatabaseConnection db, int id) {
+    public static IEnumerable<Models.Flight> GetFlights(DatabaseConnection db, int id) {
+        string query = """
+                SELECT *
+                FROM flights
+                WHERE flights.id = @Id;
+            """;
+
+        using var con = db.Open();
+        return con.Query<Models.Flight>(query, new { Id = id });
+    }
+
+    public static IEnumerable<Models.FlightJoined> GetFlightsJoined(DatabaseConnection db, int id) {
         string query = """
                 SELECT
             	    airlines.name       AS "airline",
@@ -51,17 +73,29 @@ public static class Flights {
             """;
 
         using var con = db.Open();
-        return con.Query(query, new { Id = id });
+        return con.Query<Models.FlightJoined>(query, new { Id = id });
     }
 
     public static void MapFlights(this WebApplication app) {
         app.MapGet("/flights", (DatabaseConnection db) => Results.Ok(GetFlights(db)))
         .WithName("Get Flights")
-        .WithOpenApi();
+        .WithOpenApi()
+        .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
 
-        app.MapGet("/flights/{id}", (int id, DatabaseConnection db) => Results.Ok(GetFlight(db, id)))
+        app.MapGet("/flights/joined", (DatabaseConnection db) => Results.Ok(GetFlightsJoined(db)))
+        .WithName("Get Flights Joined")
+        .WithOpenApi()
+        .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
+
+        app.MapGet("/flights/{id}", (int id, DatabaseConnection db) => Results.Ok(GetFlights(db, id)))
         .WithName("Get Flight")
-        .WithOpenApi();
+        .WithOpenApi()
+        .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
+
+        app.MapGet("/flights/{id}/joined", (int id, DatabaseConnection db) => Results.Ok(GetFlightsJoined(db, id)))
+        .WithName("Get Flight Joined")
+        .WithOpenApi()
+        .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
 
         app.MapPost("/flights", (DatabaseConnection db) => Results.StatusCode(StatusCodes.Status501NotImplemented))
         .WithName("Post Flight")
