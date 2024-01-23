@@ -1,25 +1,25 @@
-CREATE TABLE public.airlines (
-	id serial PRIMARY KEY,
-	name character varying(50) NOT NULL
+CREATE TABLE airlines (
+	id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	name VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE public.cities (
-	id serial PRIMARY KEY,
-	name character varying(50) NOT NULL,
-	population integer NOT NULL
+CREATE TABLE cities (
+	id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	name VARCHAR(50) NOT NULL,
+	population INT NOT NULL
 );
 
-CREATE TABLE public.flights (
-	id serial NOT NULL,
-	airline_id integer REFERENCES public.airlines(id),
-	origin_id integer REFERENCES public.cities(id),
-	destination_id integer REFERENCES public.cities(id),
-	distance integer NOT NULL,
-	flight_time integer NOT NULL,
-	huf_per_km integer NOT NULL
+CREATE TABLE flights (
+	id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	airline_id INT REFERENCES airlines(id),
+	origin_id INT REFERENCES cities(id),
+	destination_id INT REFERENCES cities(id),
+	distance INT NOT NULL,
+	flight_time INT NOT NULL,
+	huf_per_km INT NOT NULL
 );
 
-INSERT INTO public.airlines(name) VALUES
+INSERT INTO airlines(name) VALUES
 ('Delta Air Lines'),
 ('American Airlines'),
 ('United Airlines'),
@@ -31,7 +31,7 @@ INSERT INTO public.airlines(name) VALUES
 ('Air Canada'),
 ('Qatar Airways');
 
-INSERT INTO public.cities(name, population) VALUES
+INSERT INTO cities(name, population) VALUES
 ('Tokyo', 13960000),
 ('New York', 8419000),
 ('Paris', 2148000),
@@ -63,14 +63,14 @@ INSERT INTO public.cities(name, population) VALUES
 ('Lima', 10750000),
 ('Budapest', 1700000);
 
-INSERT INTO public.flights(airline_id, origin_id, destination_id, distance, flight_time, huf_per_km) VALUES
+INSERT INTO flights(airline_id, origin_id, destination_id, distance, flight_time, huf_per_km) VALUES
+(4, 1, 5, 2100, 300, 40),
 (1, 2, 10, 4500, 540, 50),
 (2, 2, 1, 10800, 650, 60),
 (3, 2, 3, 5800, 420, 70),
-(4, 1, 5, 2100, 300, 40),
 (5, 10, 2, 4500, 540, 80),
-(6, 5, 11, 1800, 240, 55),
 (7, 3, 4, 2800, 320, 45),
+(6, 5, 11, 1800, 240, 55),
 (8, 4, 6, 9000, 660, 55),
 (1, 7, 8, 11000, 780, 50),
 (2, 9, 10, 14000, 840, 60),
