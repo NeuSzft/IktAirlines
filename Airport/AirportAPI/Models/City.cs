@@ -6,9 +6,9 @@ public class City {
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("name")]
+    [JsonPropertyName("name"), JsonRequired]
     public string Name { get; set; } = null!;
 
-    [JsonPropertyName("population")]
+    [JsonPropertyName("population"), JsonRequired]
     public int Population { get; set; }
 }

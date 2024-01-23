@@ -6,6 +6,6 @@ public class Airline {
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("name")]
+    [JsonPropertyName("name"), JsonRequired]
     public string Name { get; set; } = null!;
 }

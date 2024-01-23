@@ -6,21 +6,21 @@ public class Flight {
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("airline_id")]
+    [JsonPropertyName("airline_id"), JsonRequired]
     public int AirlineId { get; set; }
 
-    [JsonPropertyName("origin_id")]
+    [JsonPropertyName("origin_id"), JsonRequired]
     public int OriginId { get; set; }
 
-    [JsonPropertyName("destination_id")]
+    [JsonPropertyName("destination_id"), JsonRequired]
     public int DestinationId { get; set; }
 
-    [JsonPropertyName("distance")]
+    [JsonPropertyName("distance"), JsonRequired]
     public int Distance { get; set; }
 
-    [JsonPropertyName("flight_time")]
+    [JsonPropertyName("flight_time"), JsonRequired]
     public int FlightTime { get; set; }
 
-    [JsonPropertyName("huf_per_km")]
+    [JsonPropertyName("huf_per_km"), JsonRequired]
     public int HufPerKm { get; set; }
 }
