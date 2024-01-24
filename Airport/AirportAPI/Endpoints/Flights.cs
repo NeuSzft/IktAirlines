@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AirportAPI.Endpoints;
 
@@ -49,7 +50,7 @@ public static class Flights {
         return con.Query<Models.FlightJoined>(query);
     }
 
-    public static IEnumerable<Models.Flight> GetFlight(this DatabaseConnection db, int id) {
+    public static Models.Flight? GetFlight(this DatabaseConnection db, int id) {
         const string query = """
             SELECT
                 id                  AS "Id",
@@ -64,10 +65,10 @@ public static class Flights {
         """;
 
         using var con = db.Open();
-        return con.Query<Models.Flight>(query, new { Id = id });
+        return con.Query<Models.Flight>(query, new { Id = id }).FirstOrDefault();
     }
 
-    public static IEnumerable<Models.FlightJoined> GetFlightJoined(this DatabaseConnection db, int id) {
+    public static Models.FlightJoined? GetFlightJoined(this DatabaseConnection db, int id) {
         const string query = """
             SELECT
                 flights.id          AS "Id",
@@ -88,7 +89,7 @@ public static class Flights {
         """;
 
         using var con = db.Open();
-        return con.Query<Models.FlightJoined>(query, new { Id = id });
+        return con.Query<Models.FlightJoined>(query, new { Id = id }).FirstOrDefault();
     }
 
     public static int PostFlight(this DatabaseConnection db, Models.Flight flight) {
@@ -135,13 +136,19 @@ public static class Flights {
         .WithOpenApi()
         .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
 
-        app.MapGet("/flights/{id}", (int id, DatabaseConnection db) => Results.Ok(db.GetFlight(id)))
+        app.MapGet("/flights/{id}", (int id, DatabaseConnection db) => {
+            var item = db.GetFlight(id);
+            return item is null ? Results.NotFound() : Results.Ok(item);
+        })
         .WithName("Get Flight")
         .WithTags("Flight Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
 
-        app.MapGet("/flights/{id}/joined", (int id, DatabaseConnection db) => Results.Ok(db.GetFlightJoined(id)))
+        app.MapGet("/flights/{id}/joined", (int id, DatabaseConnection db) => {
+            var item = db.GetFlightJoined(id);
+            return item is null ? Results.NotFound() : Results.Ok(item);
+        })
         .WithName("Get Flight Joined")
         .WithTags("Flight Endpoints")
         .WithOpenApi()

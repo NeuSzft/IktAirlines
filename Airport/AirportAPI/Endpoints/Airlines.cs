@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AirportAPI.Endpoints;
 
 public static class Airlines {
-    public static IEnumerable<Models.Airline> GetAirlines(DatabaseConnection db) {
+    public static IEnumerable<Models.Airline> GetAirlines(this DatabaseConnection db) {
         string query = """
                 SELECT *
                 FROM airlines
@@ -18,36 +19,31 @@ public static class Airlines {
         return con.Query<Models.Airline>(query);
     }
 
-    public static IEnumerable<Models.Airline> GetAirline(DatabaseConnection db, int id) {
+    public static Models.Airline? GetAirline(this DatabaseConnection db, int id) {
         string query = """
-                SELECT name
+                SELECT *
                 FROM airlines
                 WHERE id = @Id;
             """;
 
         using var con = db.Open();
-        return con.Query<Models.Airline>(query, new { Id = id });
+        return con.Query<Models.Airline>(query, new { Id = id }).FirstOrDefault();
     }
 
     public static void MapAirlines(this WebApplication app) {
-        app.MapGet("/airlines", (DatabaseConnection db) => Results.Ok(GetAirlines(db)))
+        app.MapGet("/airlines", (DatabaseConnection db) => Results.Ok(db.GetAirlines()))
         .WithName("Get Airlines")
-        .WithOpenApi();
+        .WithTags("Airlines Endpoints")
+        .WithOpenApi()
+        .Produces<IEnumerable<Models.Airline>>(StatusCodes.Status200OK, "application/json");
 
-        app.MapGet("/airlines/{id}", (int id, DatabaseConnection db) => Results.Ok(GetAirline(db, id)))
+        app.MapGet("/airlines/{id}", (int id, DatabaseConnection db) => {
+            var item = db.GetAirline(id);
+            return item is null ? Results.NotFound() : Results.Ok(item);
+        })
         .WithName("Get Airline")
-        .WithOpenApi();
-
-        app.MapPost("/airlines", (DatabaseConnection db) => Results.StatusCode(StatusCodes.Status501NotImplemented))
-        .WithName("Post Airline")
-        .WithOpenApi();
-
-        app.MapPut("/airlines/{id}", (int id, DatabaseConnection db) => Results.StatusCode(StatusCodes.Status501NotImplemented))
-        .WithName("Put Airline")
-        .WithOpenApi();
-
-        app.MapDelete("/airlines/{id}", (int id, DatabaseConnection db) => Results.StatusCode(StatusCodes.Status501NotImplemented))
-        .WithName("Del Airline")
-        .WithOpenApi();
+        .WithTags("Airlines Endpoints")
+        .WithOpenApi()
+        .Produces<Models.Airline?>(StatusCodes.Status200OK, "application/json");
     }
 }
