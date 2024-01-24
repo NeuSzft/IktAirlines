@@ -8,15 +8,17 @@
                 <th>Destination</th>
                 <th>Distance</th>
                 <th>Passengers</th>
+                <th>Children</th>
                 <th>Price</th>
             </thead>
             <tbody>
-                <tr v-for="item of flights" :key="item" :id="item.airline">
+                <tr v-for="item of flights" :key="item" :id="item.id">
                     <td>{{ item.airline }}</td>
-                    <td>{{ item.origin }}</td>
-                    <td>{{ item.destination }}</td>
+                    <td>{{ item.origin_city }}</td>
+                    <td>{{ item.destination_city }}</td>
                     <td>{{ item.distance }} km</td>
-                    <td>{{ item.passengers }}</td>
+                    <td>{{ 0 }}</td>
+                    <td>{{ 0 }}</td>
                     <td>{{ calculateCost(item) }} Ft</td>
                 </tr>
             </tbody>
@@ -25,46 +27,12 @@
 </template>
   
 <script>
-const cities = {
-    "Budapest": 1800000,
-    "London": 8800000,
-}
-
-const flights = [
-    { airline: "Wizz Air", origin: "Budapest", destination: "London", distance: 1450, flightTime: 145, costPerKm: 6, passengers: 0 },
-    { airline: "British Airways", origin: "Budapest", destination: "London", distance: 1200, flightTime: 155, costPerKm: 7, passengers: 0 },
-]
-
+import { ref } from 'vue'
 
 export default {
-    name: "Summary",
     data() {
         return {
-            flights
-        }
-    },
-    methods: {
-        calculateCost(flight) {
-            let baseCostPerPassenger = flight.distance * flight.costPerKm
-            let totalBaseCost = baseCostPerPassenger * flight.passengers
-
-            let vat = totalBaseCost * 0.27
-            let keroseneTax = flight.distance * 0.10
-            let destinationPop = cities[flight.destination]
-            let tourismTaxRate
-
-            if (destinationPop < 2000000) tourismTaxRate = 0.05
-            else if (destinationPop < 10000000) tourismTaxRate = 0.075
-            else tourismTaxRate = 0.10
-
-            let tourismTax = totalBaseCost * tourismTaxRate
-            let totalCost = totalBaseCost + vat + keroseneTax + tourismTax
-
-            if (flight.passengers > 10) totalCost *= 0.90
-
-            //totalCost *= 0.80 // Children discount
-
-            return Math.round(totalCost)
+            flights: ref([])
         }
     }
 }
