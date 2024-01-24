@@ -24,8 +24,8 @@
                     <input type="number" class="form-control" id="passengers" v-model="adultsCount" min="0" required>
                 </div>
                 <div class="col-12 col-md-6 mb-3">
-                    <label for="passengers" class="form-label">Number of children</label>
-                    <input type="number" class="form-control" id="passengers" v-model="childrenCount" min="0" required>
+                    <label for="children" class="form-label">Number of children</label>
+                    <input type="number" class="form-control" id="children" v-model="childrenCount" min="0" required>
                 </div>
             </div>
         </form>
