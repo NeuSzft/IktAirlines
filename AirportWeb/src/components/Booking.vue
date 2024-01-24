@@ -30,7 +30,7 @@
             </div>
         </form>
 
-        <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null && destination !== origin">
+        <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null">
             <template v-for="route in routes.filter(x => x.final === destination)" :key="route.final">
                 <div class="w-100 d-flex flex-wrap border rounded my-3">
                     <div class="col-12 col-md d-flex flex-wrap gap-3 justify-content-center  tickets">
@@ -42,9 +42,10 @@
                             <p class="fs-3 ">{{ calculateCost(route) }} HUF</p>
                         </div>
                         <div class="col">
-                            <button type="button" class="btn btn-outline-success w-100 h-100 fs-4 fw-bold"
-                                :disabled="adultsCount + childrenCount < 1">
-                                Buy ticket
+                            <button type="button" :id="route.flightIds" :key="route.flightIds"
+                                class="btn btn-outline-success w-100 h-100 fs-1 fw-bolder"
+                                :disabled="adultsCount + childrenCount < 1" @click="buyTicket(route)">
+                                <i class="bi bi-basket2-fill"></i>
                             </button>
                         </div>
                     </div>
@@ -100,7 +101,13 @@ export default {
             for (const flight of this.flights) {
                 if (flight.origin_city === this.origin) {
                     destinations.push(flight.destination_city)
-                    routes.push({ final: flight.destination_city, transfers: [], flightIds: [flight.id] })
+                    routes.push({
+                        origin: flight.origin_city,
+                        final: flight.destination_city,
+                        flightIds: [flight.id],
+                        distances: [flight.distance],
+                        flightTimes: [flight.flight_time]
+                    })
                 }
             }
 
@@ -110,12 +117,24 @@ export default {
                         if (flight1.destination_city === flight2.origin_city) {
 
                             destinations.push(flight2.destination_city)
-                            routes.push({ final: flight2.destination_city, transfers: [flight1.destination_city], flightIds: [flight1.id, flight2.id] })
+                            routes.push({
+                                origin: flight1.origin_city,
+                                final: flight2.destination_city,
+                                flightIds: [flight1.id, flight2.id],
+                                distances: [flight1.distance, flight2.distance],
+                                flightTimes: [flight1.flight_time, flight2.flight_time]
+                            })
 
                             for (const flight3 of this.flights) {
                                 if (flight2.destination_city === flight3.origin_city) {
                                     destinations.push(flight3.destination_city)
-                                    routes.push({ final: flight3.destination_city, transfers: [flight1.destination_city, flight2.destination_city], flightIds: [flight1.id, flight2.id, flight3.id] })
+                                    routes.push({
+                                        origin: flight1.origin_city,
+                                        final: flight3.destination_city,
+                                        flightIds: [flight1.id, flight2.id, flight3.id],
+                                        distances: [flight1.distance, flight2.distance, flight3.distance],
+                                        flightTimes: [flight1.flight_time, flight2.flight_time, flight3.flight_time]
+                                    })
                                 }
                             }
                         }
@@ -177,8 +196,21 @@ export default {
                     this.countriesDestination = new Set([...countriesDestination].sort())
                 })
         },
-        bookTicket() {
+        buyTicket(value) {
+            const route = toRaw(value)
 
+            let savedRoutes = JSON.parse(localStorage.getItem('savedRoutes')) || []
+
+            savedRoutes.push({
+                route: route,
+                origin: this.origin,
+                destination: this.destination,
+                children: this.childrenCount,
+                adults: this.adultsCount,
+                price: this.calculateCost(route)
+            })
+
+            localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes))
         }
     },
     components: {
