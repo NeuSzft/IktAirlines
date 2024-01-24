@@ -30,19 +30,20 @@
             </div>
         </form>
 
-        <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null">
+        <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null && destination !== origin">
             <template v-for="route in routes.filter(x => x.final === destination)" :key="route.final">
                 <div class="w-100 d-flex flex-wrap border rounded my-3">
-                    <div class="col-12 col-md d-flex flex-wrap gap-3 justify-content-center tickets">
+                    <div class="col-12 col-md d-flex flex-wrap gap-3 justify-content-center  tickets">
                         <Ticket v-for="id in route.flightIds" :key="id" :flightId="id" :adults="adultsCount"
                             :children="childrenCount" class="col-sm-12 col-lg" />
                     </div>
-                    <div class="d-flex flex-column col-12 col-lg-2 mt-2 mt-lg-0 text-center">
+                    <div class="d-flex flex-column col-12 col-lg-2 mt-2 mt-lg-0 ms-lg-3 text-center">
                         <div class="col-12 mt-lg-3">
                             <p class="fs-3 ">{{ calculateCost(route) }} HUF</p>
                         </div>
                         <div class="col">
-                            <button type="button" class="btn btn-outline-success w-100 h-100 fs-4 fw-bold">
+                            <button type="button" class="btn btn-outline-success w-100 h-100 fs-4 fw-bold"
+                                :disabled="adultsCount + childrenCount < 1">
                                 Buy ticket
                             </button>
                         </div>
@@ -69,7 +70,7 @@ export default {
             countriesDestination: new Set(),
             origin: ref(''),
             destination: ref(''),
-            adultsCount: ref(1),
+            adultsCount: ref(0),
             childrenCount: ref(0),
             passengerCount: ref(0),
             price: ref(0),
@@ -77,19 +78,13 @@ export default {
         }
     },
     watch: {
-        adultsCount(value) {
-            this.adultsCount = value
+        adultsCount() {
             this.passengerCount = this.adultsCount + this.childrenCount
         },
-        childrenCount(value) {
-            this.childrenCount = value
+        childrenCount() {
             this.passengerCount = this.adultsCount + this.childrenCount
         },
-        passengerCount(value) {
-            this.passengerCount = value
-        },
-        origin(value) {
-            this.origin = value
+        origin() {
             this.destination = null
             this.filteredDestinations()
         },
