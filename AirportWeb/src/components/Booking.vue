@@ -99,13 +99,13 @@ export default {
     },
     methods: {
         filteredDestinations() {
-            const destinations = new Array();
-            const routes = new Array();
+            const destinations = new Array()
+            const routes = new Array()
 
             for (const flight of this.flights) {
                 if (flight.origin_city === this.origin) {
-                    destinations.push(flight.destination_city);
-                    routes.push({ final: flight.destination_city, transfers: [], flightIds: [flight.id] });
+                    destinations.push(flight.destination_city)
+                    routes.push({ final: flight.destination_city, transfers: [], flightIds: [flight.id] })
                 }
             }
 
@@ -114,13 +114,13 @@ export default {
                     for (const flight2 of this.flights) {
                         if (flight1.destination_city === flight2.origin_city) {
 
-                            destinations.push(flight2.destination_city);
-                            routes.push({ final: flight2.destination_city, transfers: [flight1.destination_city], flightIds: [flight1.id, flight2.id] });
+                            destinations.push(flight2.destination_city)
+                            routes.push({ final: flight2.destination_city, transfers: [flight1.destination_city], flightIds: [flight1.id, flight2.id] })
 
                             for (const flight3 of this.flights) {
                                 if (flight2.destination_city === flight3.origin_city) {
-                                    destinations.push(flight3.destination_city);
-                                    routes.push({ final: flight3.destination_city, transfers: [flight1.destination_city, flight2.destination_city], flightIds: [flight1.id, flight2.id, flight3.id] });
+                                    destinations.push(flight3.destination_city)
+                                    routes.push({ final: flight3.destination_city, transfers: [flight1.destination_city, flight2.destination_city], flightIds: [flight1.id, flight2.id, flight3.id] })
                                 }
                             }
                         }
@@ -128,10 +128,10 @@ export default {
                 }
             }
 
-            this.countriesDestination = new Set([...destinations].sort());
-            this.routes = routes;
+            this.countriesDestination = new Set([...destinations].sort())
+            this.routes = routes
             if (this.destination !== null) {
-                this.routes = routes.filter(route => route.final === this.destination);
+                this.routes = routes.filter(route => route.final === this.destination)
             }
         },
         calculateCost(flights) {
