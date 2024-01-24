@@ -1,20 +1,20 @@
 <template>
-    <div :id="flightId" class="card" v-if="flight !== null">
-        <h4 class="card-header">{{ flight.origin_city }} → {{ flight.destination_city }}</h4>
+    <div :id="flightId" class="card w-100" v-if="flight !== null">
+        <h4 class="card-header fw-bold">{{ flight.origin_city }} → {{ flight.destination_city }}</h4>
         <div class="card-body">
             <h5 class="card-title mb-3">{{ flight.airline }}</h5>
             <p class="card-text">Distance: {{ flight.distance }} km</p>
+            <p class="card-text">Price/km: {{ flight.huf_per_km }} HUF</p>
             <p class="card-text">Passengers: {{ adults + children }}</p>
             <p class="card-text">Adults: {{ adults }}</p>
             <p class="card-text">Children: {{ children }}</p>
         </div>
-        <p class="card-footer mb-0">Price: {{ calculateCost() }} Ft</p>
+        <p class="card-footer mb-0">Price: {{ calculateCost() }} HUF</p>
     </div>
 </template>
   
 <script>
 import { http } from "@utils/http"
-import { ref } from "vue"
 
 export default {
     props: [
@@ -39,29 +39,36 @@ export default {
                 })
         },
         calculateCost() {
+            let totalCost = 0
             let baseCostPerPassenger = this.flight.distance * this.flight.huf_per_km
-            let totalBaseCost = baseCostPerPassenger * (this.adults + this.children)
 
-            let vat = totalBaseCost * 0.27
-            let keroseneTax = this.flight.distance * 0.10
+            let totalBaseCostAdult = baseCostPerPassenger * this.adults
+            let totalBaseCostChild = baseCostPerPassenger * this.children 
+
             let destinationPop = this.flight.destination_city_population
-            let tourismTaxRate
+            let tourismTaxRate = destinationPop < 2000000 ? 0.05 : destinationPop < 10000000 ? 0.075 : 0.10
 
-            if (destinationPop < 2000000) tourismTaxRate = 0.05
-            else if (destinationPop < 10000000) tourismTaxRate = 0.075
-            else tourismTaxRate = 0.10
+            let vatAdult = totalBaseCostAdult * 0.27
+            let vatChild = totalBaseCostChild * 0.27
+            let keroseneTax = this.flight.distance * 0.10
+            let tourismTaxAdult = totalBaseCostAdult * tourismTaxRate
+            let tourismTaxChild = totalBaseCostChild * tourismTaxRate
 
-            let tourismTax = totalBaseCost * tourismTaxRate
-            let totalCost = totalBaseCost + vat + keroseneTax + tourismTax
+            let flightCostAdult = totalBaseCostAdult + vatAdult + keroseneTax + tourismTaxAdult
+            let flightCostChild = totalBaseCostChild + vatChild + keroseneTax + tourismTaxChild
 
-            if (flight.passengers > 10) totalCost *= 0.90
-            if (this.children > 0) totalCost *= 0.80
+            if (this.adults + this.children > 10) {
+                flightCostAdult *= 0.90
+                flightCostChild *= 0.90
+            }
 
-            return Math.round(totalCost)
+            totalCost += flightCostAdult + (flightCostChild * 0.8)
+
+            return (this.adults + this.children > 0) ? Math.round(totalCost) : 0
         }
     },
     computed: {
-        
+
     }
 }
 </script>

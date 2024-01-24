@@ -41,7 +41,7 @@
 </template>
   
 <script>
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { http } from "@utils/http"
 import Ticket from "@components/Ticket.vue"
 
@@ -121,26 +121,37 @@ export default {
                 this.routes = routes.filter(route => route.final === this.destination);
             }
         },
-        calculateCost(flight) {
+        calculateCost(flights) {
+            let totalCost = 0
+            for (const id of toRaw(flights.flightIds)) {
+                const flight = toRaw(this.flights.find(x => x.id === id))
+
             let baseCostPerPassenger = flight.distance * flight.huf_per_km
-            let totalBaseCost = baseCostPerPassenger * (this.adults + this.children)
 
-            let vat = totalBaseCost * 0.27
+                let totalBaseCostAdult = baseCostPerPassenger * this.adultsCount
+                let totalBaseCostChild = baseCostPerPassenger * this.childrenCount
+
+                let destinationPop = flight.destination_city_population
+                let tourismTaxRate = destinationPop < 2000000 ? 0.05 : destinationPop < 10000000 ? 0.075 : 0.10
+
+                let vatAdult = totalBaseCostAdult * 0.27
+                let vatChild = totalBaseCostChild * 0.27
             let keroseneTax = flight.distance * 0.10
-            let destinationPop = flight.destination_city_population
-            let tourismTaxRate
+                let tourismTaxAdult = totalBaseCostAdult * tourismTaxRate
+                let tourismTaxChild = totalBaseCostChild * tourismTaxRate
 
-            if (destinationPop < 2000000) tourismTaxRate = 0.05
-            else if (destinationPop < 10000000) tourismTaxRate = 0.075
-            else tourismTaxRate = 0.10
+                let flightCostAdult = totalBaseCostAdult + vatAdult + keroseneTax + tourismTaxAdult
+                let flightCostChild = totalBaseCostChild + vatChild + keroseneTax + tourismTaxChild
 
-            let tourismTax = totalBaseCost * tourismTaxRate
-            let totalCost = totalBaseCost + vat + keroseneTax + tourismTax
+                if (flight.passengerCount > 10) {
+                    flightCostAdult *= 0.90
+                    flightCostChild *= 0.90
+                }
 
-            if (flight.passengers > 10) totalCost *= 0.90
-            if (this.children > 0) totalCost *= 0.80
+                totalCost += flightCostAdult + (flightCostChild * 0.8)
+            }
 
-            return Math.round(totalCost)
+            return (this.adultsCount + this.childrenCount > 0) ? Math.round(totalCost) : 0
         },
         getFlights() {
             http.get("/flights/joined")
