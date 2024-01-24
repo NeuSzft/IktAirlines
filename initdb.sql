@@ -65,8 +65,8 @@ INSERT INTO cities(name, population) VALUES
 
 INSERT INTO flights(airline_id, origin_id, destination_id, distance, flight_time, huf_per_km) VALUES
 (4, 1, 5, 2100, 300, 40),
-(1, 2, 10, 4500, 540, 50),
-(2, 2, 1, 10800, 650, 60),
+(1, 2, 10, 450, 540, 50),
+(2, 2, 1, 1080, 650, 60),
 (3, 2, 3, 5800, 420, 70),
 (5, 10, 2, 4500, 540, 80),
 (7, 3, 4, 2800, 320, 45),
@@ -77,5 +77,14 @@ INSERT INTO flights(airline_id, origin_id, destination_id, distance, flight_time
 (3, 11, 12, 2200, 300, 70),
 (4, 13, 14, 2000, 280, 40),
 (5, 15, 16, 12000, 720, 80),
-(6, 17, 18, 9000, 660, 55),
-(7, 19, 20, 5000, 360, 45);
+(6, 17, 18, 900, 660, 55),
+(7, 19, 20, 500, 360, 45),
+(10, 21, 22, 6500, 600, 55),  -- Toronto to Berlin
+(2, 21, 2, 551, 600, 55),  -- Toronto to New York
+(6, 22, 10, 7500, 570, 55),  -- Berlin to Tokyo
+(4, 23, 2, 3300, 340, 40),    -- Mexico City to New York
+(2, 2, 3, 5800, 420, 60),     -- New York to Paris
+(5, 6, 24, 9000, 660, 80),    -- Sydney to Bangkok
+(6, 24, 25, 1400, 180, 55),   -- Bangkok to Jakarta
+(7, 5, 26, 5600, 480, 45),    -- Beijing to Istanbul
+(8, 26, 9, 5600, 480, 60);   -- Istanbul to Mumbai
