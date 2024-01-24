@@ -1,7 +1,7 @@
 <template>
     <div id="booking" class="container mt-5">
         <h1 class="text-center mb-4">Flight Booking</h1>
-        <form id="bookingForm" @submit.prevent="bookTicket">
+        <form id="bookingForm">
             <div class="row">
                 <div class="col-12 col-md-6 mb-3">
                     <label for="originCity" class="form-label">Origin City</label>
@@ -28,13 +28,26 @@
                     <input type="number" class="form-control" id="passengers" v-model="childrenCount" min="0" required>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary d-block float-end my-3">Book a flight</button>
         </form>
 
-        <div id="flight" class="container d-flex flex-wrap justify-content-around" v-if="destination !== null">
+        <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null">
             <template v-for="route in routes.filter(x => x.final === destination)" :key="route.final">
-                <Ticket v-for="id in route.flightIds" :key="id" :flightId="id" :adults="adultsCount"
-                    :children="childrenCount" />
+                <div class="w-100 d-flex flex-wrap border rounded my-3">
+                    <div class="col-12 col-md d-flex flex-wrap gap-3 justify-content-center tickets">
+                        <Ticket v-for="id in route.flightIds" :key="id" :flightId="id" :adults="adultsCount"
+                            :children="childrenCount" class="col-sm-12 col-lg" />
+                    </div>
+                    <div class="d-flex flex-column col-12 col-lg-2 mt-2 mt-lg-0 text-center">
+                        <div class="col-12 mt-lg-3">
+                            <p class="fs-3 ">{{ calculateCost(route) }} HUF</p>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-outline-success w-100 h-100 fs-4 fw-bold">
+                                Buy ticket
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </template>
         </div>
     </div>
@@ -126,7 +139,7 @@ export default {
             for (const id of toRaw(flights.flightIds)) {
                 const flight = toRaw(this.flights.find(x => x.id === id))
 
-            let baseCostPerPassenger = flight.distance * flight.huf_per_km
+                let baseCostPerPassenger = flight.distance * flight.huf_per_km
 
                 let totalBaseCostAdult = baseCostPerPassenger * this.adultsCount
                 let totalBaseCostChild = baseCostPerPassenger * this.childrenCount
@@ -136,7 +149,7 @@ export default {
 
                 let vatAdult = totalBaseCostAdult * 0.27
                 let vatChild = totalBaseCostChild * 0.27
-            let keroseneTax = flight.distance * 0.10
+                let keroseneTax = flight.distance * 0.10
                 let tourismTaxAdult = totalBaseCostAdult * tourismTaxRate
                 let tourismTaxChild = totalBaseCostChild * tourismTaxRate
 
