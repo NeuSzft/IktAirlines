@@ -23,4 +23,6 @@ public class Flight {
 
     [JsonPropertyName("huf_per_km"), JsonRequired]
     public int HufPerKm { get; set; }
+
+    public override string ToString() => $"{OriginId} - {DestinationId} ({Id})";
 }

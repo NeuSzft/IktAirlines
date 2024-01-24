@@ -11,4 +11,6 @@ public class City {
 
     [JsonPropertyName("population"), JsonRequired]
     public int Population { get; set; }
+
+    public override string ToString() => $"{Name} ({Id})";
 }

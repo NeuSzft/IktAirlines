@@ -8,4 +8,6 @@ public class Airline {
 
     [JsonPropertyName("name"), JsonRequired]
     public string Name { get; set; } = null!;
+
+    public override string ToString() => $"{Name} ({Id})";
 }
