@@ -51,6 +51,7 @@ internal static class Program {
         app.Logger.LogInformation(Environment.GetEnvironmentVariable(ConStrEnv));
 
         app.MapFlights();
+        app.MapCities();
         app.MapAirlines();
 
         app.Run();
