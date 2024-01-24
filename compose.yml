@@ -19,6 +19,7 @@ services:
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
         COPY ./Airport/AirportAPI /build/AirportAPI
+        COPY ./Airport/AirportAPI.Models /build/AirportAPI.Models
         WORKDIR /build/AirportAPI
         ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
     volumes:
@@ -50,7 +51,7 @@ services:
       - ./AirportWeb:/app
       - web-app:/app/dist
     command: >
-      bash -c "npm update &&
+      bash -c "npm install &&
                npm run build"
 
   web:
