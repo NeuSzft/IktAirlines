@@ -53,6 +53,7 @@ internal static class Program {
         app.MapFlights();
         app.MapCities();
         app.MapAirlines();
+        app.MapOther();
 
         app.Run();
     }
