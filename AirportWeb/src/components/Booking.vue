@@ -234,6 +234,12 @@ export default {
                 children: this.childrenCount,
                 adults: this.adultsCount,
                 price: this.calculateCost(route),
+                date: new Date().toDateString(),
+                time: new Date().toLocaleTimeString(navigator.language, {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric'
+                })
             })
 
             localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes))
