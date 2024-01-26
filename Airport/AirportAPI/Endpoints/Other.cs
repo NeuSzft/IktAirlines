@@ -22,7 +22,7 @@ public static class Other {
         .WithName("Get next available Airline Id")
         .WithTags("Other Endpoints")
         .WithOpenApi()
-        .Produces<int>(StatusCodes.Status200OK, "application/json")
+        .Produces<int>(StatusCodes.Status200OK, "text/plain")
         .Produces(StatusCodes.Status404NotFound);
 
         app.MapGet("/next-id/cities", (DatabaseConnection db) => {
@@ -32,7 +32,7 @@ public static class Other {
         .WithName("Get next available City Id")
         .WithTags("Other Endpoints")
         .WithOpenApi()
-        .Produces<int>(StatusCodes.Status200OK, "application/json")
+        .Produces<int>(StatusCodes.Status200OK, "text/plain")
         .Produces(StatusCodes.Status404NotFound);
 
         app.MapGet("/next-id/flights", (DatabaseConnection db) => {
@@ -42,7 +42,7 @@ public static class Other {
         .WithName("Get next available Flight Id")
         .WithTags("Other Endpoints")
         .WithOpenApi()
-        .Produces<int>(StatusCodes.Status200OK, "application/json")
+        .Produces<int>(StatusCodes.Status200OK, "text/plain")
         .Produces(StatusCodes.Status404NotFound);
     }
 }
