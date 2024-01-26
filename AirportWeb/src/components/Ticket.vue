@@ -35,7 +35,7 @@ export default {
         getFlight() {
             http.get(`/flights/${this.flightId}/joined`)
                 .then(response => {
-                    this.flight = response.data[0]
+                    this.flight = response.data
                 })
         },
         calculateCost() {
