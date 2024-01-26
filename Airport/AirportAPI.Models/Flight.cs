@@ -2,9 +2,7 @@
 
 namespace AirportAPI.Models;
 
-public class Flight {
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
+public sealed class Flight : IdModel {
 
     [JsonPropertyName("airline_id"), JsonRequired]
     public int AirlineId { get; set; }

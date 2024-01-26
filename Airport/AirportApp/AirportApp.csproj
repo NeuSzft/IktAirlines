@@ -7,4 +7,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AirportAPI.Models\AirportAPI.Models.csproj" />
+  </ItemGroup>
+
 </Project>

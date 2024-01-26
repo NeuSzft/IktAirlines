@@ -2,9 +2,7 @@
 
 namespace AirportAPI.Models;
 
-public class City {
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
+public sealed class City : IdModel {
 
     [JsonPropertyName("name"), JsonRequired]
     public string Name { get; set; } = null!;

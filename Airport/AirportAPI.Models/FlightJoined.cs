@@ -2,9 +2,7 @@
 
 namespace AirportAPI.Models;
 
-public class FlightJoined {
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
+public sealed class FlightJoined : IdModel {
 
     [JsonPropertyName("airline"), JsonRequired]
     public string Airline { get; set; } = null!;
