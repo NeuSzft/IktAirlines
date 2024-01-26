@@ -1,4 +1,13 @@
 <template>
+    <div v-if="isPurchased"
+        class="alert alert-success position-fixed translate-middle top-25 start-50 w-75 fs-5 text-center" role="alert">
+        <i class="bi bi-check-circle"></i>
+        <span>
+            Flight for <router-link :to="ticketLink" aria-current="page" class="alert-link d-inline fw-bold">{{ origin }} →
+                {{ destination }}</router-link> has been booked!
+        </span>
+    </div>
+
     <div id="booking" class="container mt-5">
         <h1 class="text-center mb-4">Flight Booking</h1>
         <form id="bookingForm">
@@ -43,8 +52,8 @@
                         </div>
                         <div class="col">
                             <button type="button" :id="route.flightIds" :key="route.flightIds"
-                                class="btn btn-outline-success w-100 h-100 fs-1 fw-bolder"
-                                :disabled="adultsCount + childrenCount < 1" @click="buyTicket(route)">
+                                :disabled="adultsCount + childrenCount < 1" @click="buyTicket(route)"
+                                class="btn btn-outline-success w-100 h-100 fs-1 fw-bolder">
                                 <i class="bi bi-basket2-fill"></i>
                             </button>
                         </div>
@@ -75,7 +84,10 @@ export default {
             childrenCount: ref(0),
             passengerCount: ref(0),
             price: ref(0),
-            routes: new Array()
+            routes: new Array(),
+            isPurchased: false,
+            purchaseTimeout: null,
+            ticketLink: 0
         }
     },
     watch: {
@@ -88,10 +100,26 @@ export default {
         origin() {
             this.destination = null
             this.filteredDestinations()
+            this.isPurchased = false
         },
         destination(value) {
             this.destination = value
-        }
+            this.isPurchased = false
+        },
+        isPurchased(value) {
+            if (value) {
+                this.purchaseTimeout = setTimeout(() => {
+                    this.isPurchased = false
+                    this.purchaseTimeout = null
+                }, 5000)
+            }
+            else {
+                if (this.purchaseTimeout) {
+                    clearTimeout(this.purchaseTimeout)
+                    this.purchaseTimeout = null
+                }
+            }
+        },
     },
     methods: {
         filteredDestinations() {
@@ -203,14 +231,14 @@ export default {
 
             savedRoutes.push({
                 route: route,
-                origin: this.origin,
-                destination: this.destination,
                 children: this.childrenCount,
                 adults: this.adultsCount,
-                price: this.calculateCost(route)
+                price: this.calculateCost(route),
             })
 
             localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes))
+            this.isPurchased = true
+            this.ticketLink = `/summary/#ticket-${savedRoutes.length - 1}`
         }
     },
     components: {
