@@ -9,7 +9,7 @@
             <p class="card-text">Adults: {{ adults }}</p>
             <p class="card-text">Children: {{ children }}</p>
         </div>
-        <p class="card-footer mb-0">Price: {{ calculateCost() }} HUF</p>
+        <p class="card-footer fw-bold mb-0">Price: {{ calculateCost() }} HUF</p>
     </div>
 </template>
   
