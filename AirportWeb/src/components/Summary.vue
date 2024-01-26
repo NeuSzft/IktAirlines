@@ -1,15 +1,31 @@
 <template>
-    <div id="summary" class="container mt-5">
-        <h1 class="text-center mb-4">Summary</h1>
-        <div id="tickets" class="" v-if="tickets.length > 0">
-            <div class="row mt-5 card" v-for="(ticket, index) in tickets" :key="index">
+    <div id="summary" class="container my-5">
+        <h1 class="text-center mb-5">Booked flights</h1>
+        <div id="tickets" v-if="tickets.length > 0">
+            <div class="row my-4 card" v-for="(ticket, index) in tickets" :key="index" :id="`ticket-${index}`">
                 <div class="card py-3">
-                    <div class="fs-3 fw-bold d-flex justify-content-between">
-                        <div class="col-11 mt-0 align-middle">
-                            {{ tickets[index].route.origin }}→{{ tickets[index].route.final }}
+                    <div class="fw-bold d-flex flex-wrap text-center text-lg-start justify-content-center justify-content-lg-between">
+                        <div class="col-12 col-lg-9 mt-0 mb-3 mb-lg-0 align-self-center fs-3">
+                            <span class="origin-destination">{{ tickets[index].route.origin }}→{{ tickets[index].route.final }}</span>
                         </div>
-                        <div class="col-1 mt-0 ">
-                            <button type="button" class="btn align-middle w-100 h-100" @click="toggleTickets(index)">
+                        <div class="col d-flex flex-wrap gap-1 mx-1 justify-content-center align-self-center">
+                            <div class="row pe-2">
+                                <div class="coljustify-self-center align-self-center">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                            </div>
+                            <div class="row d-flex flex-column gap-1">
+                                <div class="col">
+                                    <span>{{ tickets[index].date }}</span>
+                                </div>
+                                <div class="col">
+                                    <span>{{ tickets[index].time }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-1 pt-3 pt-lg-0">
+                            <button type="button" class="btn border border-2 rounded align-middle w-100 h-100 p-3"
+                                @click="toggleTickets(index)">
                                 <i :class="showTickets[index] ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
                             </button>
                         </div>
@@ -18,18 +34,19 @@
                 <div v-if="showTickets[index]" class="tickets col-12 col-md d-flex flex-wrap gap-3 mt-3">
                     <Ticket class="col-sm-12 col-lg w-75" v-for="id in ticket.route.flightIds" :key="id" :flightId="id"
                         :adults="ticket.adults" :children="ticket.children" />
-                    <div class="container col-12 d-flex flex-row text-center justify-content-around fs-4 pb-4" v-if="showTickets[index]">
+                    <div class="container col-12 d-flex flex-row text-center justify-content-around fs-4 pb-4"
+                        v-if="showTickets[index]">
                         <div class="col-3">
-                            <div class="col-12"> Total distance </div>
-                            <div class="col-12 fw-bold"> {{ getTotalTravelDistance(index) }} km </div>
+                            <div class="col-12"><span>Total distance</span></div>
+                            <div class="col-12 fw-bold"><span class="travel-distance">{{ getTotalTravelDistance(index) }}</span> km</div>
                         </div>
                         <div class="col-3">
-                            <div class="col-12"> Total flight time </div>
-                            <div class="col-12 fw-bold"> {{ getTotalTravelTime(index) }} min </div>
+                            <div class="col-12"><span>Total flight time</span></div>
+                            <div class="col-12 fw-bold"><span class="travel-time">{{ getTotalTravelTime(index) }}</span> min</div>
                         </div>
                         <div class="col-3">
-                            <div class="col-12"> Total cost </div>
-                            <div class="col-12 fw-bold"> {{ ticket.price }} HUF </div>
+                            <div class="col-12"><span>Total cost</span></div>
+                            <div class="col-12 fw-bold"><span class="travel-price">{{ ticket.price }}</span> HUF</div>
                         </div>
                     </div>
                 </div>
