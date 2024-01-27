@@ -1,9 +1,10 @@
 using AirportAPI.Models;
 using System;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Shell;
 
 namespace AirportApp;
 
@@ -63,23 +64,29 @@ internal class Wnd : Window {
             destinationIdColumn.ItemsSource = citiesTab.LocalData.ItemIds;
         };
 
-        TabControl content = new();
+        TabControl content = new() { Margin = new(0, 8, 0, 0) };
+        content.Items.Add(new HomeTab(helper, airlinesTab.FillDataGrids, citiesTab.FillDataGrids, flightsTab.FillDataGrids));
         content.Items.Add(airlinesTab);
         content.Items.Add(citiesTab);
         content.Items.Add(flightsTab);
 
+        Background = Brushes.Transparent;
+        MinWidth = 500;
+        MinHeight = 300;
         Content = content;
-        Title = "Airport App";
+        Title = "Airport Database Manager";
 
         Closed += (_, _) => helper.Dispose();
 
-        WindowStyle = WindowStyle.ThreeDBorderWindow;
-    }
-}
+        foreach (IInputElement element in content.Items)
+            WindowChrome.SetIsHitTestVisibleInChrome(element, true);
 
-internal static class WinApi {
-    [DllImport("shell32.dll")]
-    public static extern int ExtractIconEx(string file, int iconIndex, out IntPtr large, out IntPtr small, int iconsCount);
+        WindowChrome.SetWindowChrome(this, new() {
+            ResizeBorderThickness = new(4),
+            GlassFrameThickness = new(0, 32, 0, 0),
+            CaptionHeight = 32
+        });
+    }
 }
 
 internal static class Program {

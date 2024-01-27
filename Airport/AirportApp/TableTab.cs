@@ -1,24 +1,21 @@
 ﻿using AirportAPI.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace AirportApp;
 
 internal sealed class TableTab<T> : TabItem where T : IdModel {
     private Grid _content = new();
-    private Button _deleteButton = new() { Width = 28, Margin = new(2), Content = new Image { Source = GetIcon(131) }, IsEnabled = false };
-    private Button _undoAllButton = new() { Width = 28, Margin = new(2), Content = new Image { Source = GetIcon(297) }, ToolTip = "Undo All Changes" };
-    private Button _updateButton = new() { Width = 28, Margin = new(2), Content = new Image { Source = GetIcon(299) }, ToolTip = "Upload Changes" };
-    private Button _fetchButton = new() { Width = 28, Margin = new(2), Content = new Image { Source = GetIcon(238) }, ToolTip = "Fetch" };
+    private GlyphButton _deleteButton = new(0xE74D, Brushes.Red, 28) { Margin = new(2), IsEnabled = false };
+    private GlyphButton _undoAllButton = new(0xE7A7, Brushes.RoyalBlue, 28) { Margin = new(2), ToolTip = "Undo All Changes" };
+    private GlyphButton _updateButton = new(0xE898, Brushes.Green, 28) { Margin = new(2), ToolTip = "Upload Changes" };
+    private GlyphButton _fetchButton = new(0xE72C, Brushes.RoyalBlue, 28) { Margin = new(2), ToolTip = "Fetch" };
     private TextBlock _fetchResult = new() { Margin = new(2), TextAlignment = TextAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
 
     public CustomGrid<T> LocalData { get; } = new() { MinRowHeight = 22, AutoGenerateColumns = false, CanUserResizeRows = false };
@@ -40,10 +37,10 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
         remotePanel.Children.Add(_fetchResult);
         remotePanel.Children.Add(_fetchButton);
 
-        GroupBox _groupLocal = new() { Header = "Local" };
+        GroupBox _groupLocal = new() { Header = "Local", Margin = new(0, 0, 2, 0) };
         _groupLocal.Content = LocalData;
 
-        GroupBox _groupRemote = new() { Header = "Remote", Margin = new(8, 0, 0, 0) };
+        GroupBox _groupRemote = new() { Header = "Remote", Margin = new(10, 0, 0, 0) };
         _groupRemote.Content = RemoteData;
 
         GridSplitter splitter = new() { Width = 8, Margin = new(0, 9, 0, 0), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Stretch };
@@ -72,11 +69,16 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
         _fetchButton.Click += (_, _) => _ = FetchRemoteItems();
         LocalData.SelectedCellsChanged += (_, _) => SelectionChanged();
 
-        Header = header;
+        Header = new TextBlock { Text = header, Width = 64, Height = 16, TextAlignment = TextAlignment.Center };
         Content = _content;
 
         CreateDataGridColumns(columns);
-        Loaded += (_, _) => _ = FillDataGrids();
+    }
+
+    public async Task<bool> FillDataGrids() {
+        bool success = await FetchRemoteItems();
+        ResetItems();
+        return success;
     }
 
     private void DeleteItems() {
@@ -95,7 +97,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
 
     }
 
-    private async Task FetchRemoteItems() {
+    private async Task<bool> FetchRemoteItems() {
         _fetchResult.Text = $"Fetching...";
 
         if (NextId is not null)
@@ -106,11 +108,13 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
             if (data is not null) {
                 _fetchResult.Text = $"Last fetched at {DateTime.Now.ToLongTimeString()}";
                 RemoteData.ItemsSource = data;
-                return;
+                return true;
             }
 
         }
+
         _fetchResult.Text = $"Failed to fetch at {DateTime.Now.ToLongTimeString()}";
+        return false;
     }
 
     private void SelectionChanged() {
@@ -131,17 +135,5 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
             LocalData.Columns.Add(column);
             RemoteData.Columns.Add(remoteCol);
         }
-    }
-
-    private async Task FillDataGrids() {
-        await FetchRemoteItems();
-        ResetItems();
-    }
-
-    private static ImageSource GetIcon(int index, bool forceSmall = false) {
-        string resourcePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SystemResources", "shell32.dll.mun");
-        IntPtr small, large;
-        WinApi.ExtractIconEx(resourcePath, index, out large, out small, 1);
-        return Imaging.CreateBitmapSourceFromHIcon(large == IntPtr.Zero || forceSmall ? small : large, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
     }
 }

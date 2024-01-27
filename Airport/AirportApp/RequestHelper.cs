@@ -58,6 +58,19 @@ internal sealed class RequestHelper(string baseAddress) : IDisposable {
         }
     }
 
+    public async Task<bool> Ping() {
+        try {
+            return (await _client.GetAsync("/ping")).IsSuccessStatusCode;
+        } catch {
+            return false;
+        }
+    }
+
+    public void SetBaseAddress(string baseAddress) {
+        _client.Dispose();
+        _client = new() { BaseAddress = new(baseAddress) };
+    }
+
     public void Dispose() => _client.Dispose();
 
     private void ShowRequestError(string httpMethod, string path, Exception e) {
