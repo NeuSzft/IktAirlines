@@ -126,13 +126,13 @@ public static class Flights {
     public static void MapFlights(this WebApplication app) {
         app.MapGet("/flights", (DatabaseConnection db) => Results.Ok(db.GetFlights()))
         .WithName("Get Flights")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
 
         app.MapGet("/flights/joined", (DatabaseConnection db) => Results.Ok(db.GetFlightsJoined()))
         .WithName("Get Flights Joined")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
 
@@ -141,7 +141,7 @@ public static class Flights {
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
         .WithName("Get Flight")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
 
@@ -150,20 +150,20 @@ public static class Flights {
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
         .WithName("Get Flight Joined")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
 
         app.MapPost("/flights", (Models.Flight flight, DatabaseConnection db) => db.PostFlight(flight) > 0 ? Results.Created() : Results.BadRequest())
         .WithName("Post Flight")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest);
 
         app.MapPut("/flights/{id}", (int id, Models.Flight flight, DatabaseConnection db) => db.PutFlight(id, flight) > 0 ? Results.Ok() : Results.NotFound())
         .WithName("Put Flight")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
@@ -171,7 +171,7 @@ public static class Flights {
 
         app.MapDelete("/flights/{id}", (int id, DatabaseConnection db) => db.DelFlight(id) > 0 ? Results.Ok() : Results.NotFound())
         .WithName("Del Flight")
-        .WithTags("Flight Endpoints")
+        .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);

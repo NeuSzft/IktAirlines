@@ -30,6 +30,37 @@ public static class Airlines {
         return con.Query<Models.Airline>(query, new { Id = id }).FirstOrDefault();
     }
 
+    public static int PostAirline(this DatabaseConnection db, Models.Airline airline) {
+        const string query = """
+            INSERT INTO airlines(name)
+            VALUES (@Name);
+        """;
+
+        using var con = db.Open();
+        return con.Execute(query, new { airline.Name });
+    }
+
+    public static int PutAirline(this DatabaseConnection db, int id, Models.Airline airline) {
+        const string query = """
+            UPDATE airlines
+            SET name=@Name
+            WHERE id = @Id;
+        """;
+
+        using var con = db.Open();
+        return con.Execute(query, new { Id = id, airline.Name });
+    }
+
+    public static int DelAirline(this DatabaseConnection db, int id) {
+        const string query = """
+            DELETE FROM airlines
+            WHERE id = @Id;
+        """;
+
+        using var con = db.Open();
+        return con.Execute(query, new { Id = id });
+    }
+
     public static void MapAirlines(this WebApplication app) {
         app.MapGet("/airlines", (DatabaseConnection db) => Results.Ok(db.GetAirlines()))
         .WithName("Get Airlines")
@@ -45,5 +76,27 @@ public static class Airlines {
         .WithTags("Airlines Endpoints")
         .WithOpenApi()
         .Produces<Models.Airline?>(StatusCodes.Status200OK, "application/json");
+
+        app.MapPost("/airlines", (Models.Airline airline, DatabaseConnection db) => db.PostAirline(airline) > 0 ? Results.Created() : Results.BadRequest())
+        .WithName("Post Airline")
+        .WithTags("Airlines Endpoints")
+        .WithOpenApi()
+        .Produces(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status400BadRequest);
+
+        app.MapPut("/airlines/{id}", (int id, Models.Airline airline, DatabaseConnection db) => db.PutAirline(id, airline) > 0 ? Results.Ok() : Results.NotFound())
+        .WithName("Put Airline")
+        .WithTags("Airlines Endpoints")
+        .WithOpenApi()
+        .Produces(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status404NotFound);
+
+        app.MapDelete("/airlines/{id}", (int id, DatabaseConnection db) => db.DelAirline(id) > 0 ? Results.Ok() : Results.NotFound())
+        .WithName("Del Airline")
+        .WithTags("Airlines Endpoints")
+        .WithOpenApi()
+        .Produces(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound);
     }
 }
