@@ -89,8 +89,9 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
 
     private void ResetItems() {
         LocalData.ItemList.Clear();
-        foreach (T item in RemoteData.ItemsSource.Cast<T>())
-            LocalData.ItemList.Add((T)item.Clone());
+        if (RemoteData.ItemsSource is not null)
+            foreach (T item in RemoteData.ItemsSource.Cast<T>())
+                LocalData.ItemList.Add((T)item.Clone());
     }
 
     private async Task UpdateRemoteItems() {

@@ -8,7 +8,7 @@ namespace AirportApp;
 
 internal sealed class HomeTab : TabItem {
     TextBox _addressBox = new() { Margin = new(16, 16, 16, 0), FontSize = 15, BorderThickness = new(2) };
-    Button _okButton = new() { Margin = new(16), Content = new TextBlock { Text = "Set", FontSize = 15 } };
+    CustomButton _okButton = new("Set", 15) { Margin = new(16) };
     TextBlock _resultText = new() { Margin = new(16, 0, 16, 16), Text = "Not set yet" };
 
     public HomeTab(RequestHelper helper, params Func<Task<bool>>[] tableFetchers) {
