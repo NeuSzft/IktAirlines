@@ -15,6 +15,12 @@ public static class Other {
     }
 
     public static void MapOther(this WebApplication app) {
+        app.MapGet("/ping", () => Results.Ok())
+        .WithName("Check if API is available")
+        .WithTags("Other Endpoints")
+        .WithOpenApi()
+        .Produces(StatusCodes.Status200OK);
+
         app.MapGet("/next-id/airlines", (DatabaseConnection db) => {
             int? id = db.GetNextId("airlines");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
