@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,10 +19,11 @@ internal sealed class Functions<T> {
     public Func<Task<int?>>? NextId { get; set; }
 }
 
-internal sealed class TableTab<T> : TabItem where T : IdModel {
+internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     private Grid _content = new();
     private GlyphButton _deleteButton = new(0xE74D, Brushes.Red, 28) { Margin = new(2), IsEnabled = false };
     private GlyphButton _undoAllButton = new(0xE7A7, Brushes.RoyalBlue, 28) { Margin = new(2), ToolTip = "Undo All Changes" };
+    private GlyphButton _showChangesButton = new(0xE94D, Brushes.Goldenrod, 28) { Margin = new(2), ToolTip = "Show Changes" };
     private GlyphButton _updateButton = new(0xE898, Brushes.Green, 28) { Margin = new(2), ToolTip = "Upload Changes" };
     private GlyphButton _fetchButton = new(0xE72C, Brushes.RoyalBlue, 28) { Margin = new(2), ToolTip = "Fetch" };
     private TextBlock _fetchResult = new() { Margin = new(2), TextAlignment = TextAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
@@ -35,6 +37,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
         DockPanel localPanel = new() { HorizontalAlignment = HorizontalAlignment.Left };
         localPanel.Children.Add(_deleteButton);
         localPanel.Children.Add(_undoAllButton);
+        localPanel.Children.Add(_showChangesButton);
         localPanel.Children.Add(_updateButton);
 
         DockPanel remotePanel = new() { HorizontalAlignment = HorizontalAlignment.Right };
@@ -69,6 +72,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
 
         _deleteButton.Click += (_, _) => DeleteItems();
         _undoAllButton.Click += (_, _) => ResetItems();
+        _showChangesButton.Click += (_, _) => ShowChanges();
         _updateButton.Click += (_, _) => _ = UpdateRemoteItems();
         _fetchButton.Click += (_, _) => _ = FetchRemoteItems();
         LocalData.SelectedCellsChanged += (_, _) => SelectionChanged();
@@ -97,6 +101,27 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
         if (RemoteData.ItemsSource is not null)
             foreach (T item in RemoteData.ItemsSource.Cast<T>())
                 LocalData.ItemList.Add((T)item.Clone());
+        LocalData.Changes.Clear();
+    }
+
+    private void ShowChanges() {
+        StringBuilder sb = new();
+
+        sb.AppendLine("New Items:");
+        foreach (T item in LocalData.Changes.AddedItems)
+            sb.AppendLine($"  {item}");
+
+        sb.AppendLine();
+        sb.AppendLine("Updated Items:");
+        foreach (T item in LocalData.Changes.UpdatedItems)
+            sb.AppendLine($"  {item}");
+
+        sb.AppendLine();
+        sb.AppendLine("Removed Items:");
+        foreach (T item in LocalData.Changes.RemovedItems)
+            sb.AppendLine($"  {item}");
+
+        MessageBox.Show(sb.ToString(), $"{(Header as TextBlock)?.Text} Changes");
     }
 
     private async Task UpdateRemoteItems() {
@@ -116,7 +141,6 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
                 RemoteData.ItemsSource = data;
                 return true;
             }
-
         }
 
         _fetchResult.Text = $"Failed to fetch at {DateTime.Now.ToLongTimeString()}";
