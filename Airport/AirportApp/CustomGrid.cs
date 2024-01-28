@@ -15,6 +15,17 @@ internal class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> {
         public HashSet<T> UpdatedItems { get; } = new();
         public HashSet<T> RemovedItems { get; } = new();
 
+        public int Count => AddedItems.Count + UpdatedItems.Count + RemovedItems.Count;
+
+        public void Cleanup() {
+            T[] added = new T[AddedItems.Count];
+            AddedItems.CopyTo(added);
+
+            AddedItems.RemoveWhere(RemovedItems.Contains);
+            UpdatedItems.RemoveWhere(RemovedItems.Union(added).Contains);
+            RemovedItems.RemoveWhere(added.Contains);
+        }
+
         public void Clear() {
             AddedItems.Clear();
             UpdatedItems.Clear();

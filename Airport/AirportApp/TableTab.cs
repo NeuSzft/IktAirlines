@@ -26,6 +26,8 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     private GlyphButton _showChangesButton = new(0xE94D, Brushes.Goldenrod, 28) { Margin = new(2), ToolTip = "Show Changes" };
     private GlyphButton _updateButton = new(0xE898, Brushes.Green, 28) { Margin = new(2), ToolTip = "Upload Changes" };
     private GlyphButton _fetchButton = new(0xE72C, Brushes.RoyalBlue, 28) { Margin = new(2), ToolTip = "Fetch" };
+
+    private TextBlock _updateResult = new() { Margin = new(2), TextAlignment = TextAlignment.Left, VerticalAlignment = VerticalAlignment.Center };
     private TextBlock _fetchResult = new() { Margin = new(2), TextAlignment = TextAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
 
     public CustomGrid<T> LocalData { get; } = new() { MinRowHeight = 22, AutoGenerateColumns = false, CanUserResizeRows = false };
@@ -39,6 +41,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
         localPanel.Children.Add(_undoAllButton);
         localPanel.Children.Add(_showChangesButton);
         localPanel.Children.Add(_updateButton);
+        localPanel.Children.Add(_updateResult);
 
         DockPanel remotePanel = new() { HorizontalAlignment = HorizontalAlignment.Right };
         remotePanel.Children.Add(_fetchResult);
@@ -97,6 +100,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     }
 
     private void ResetItems() {
+        LocalData.NextItemId = LocalData.RemoteNextItemId;
         LocalData.ItemList.Clear();
         if (RemoteData.ItemsSource is not null)
             foreach (T item in RemoteData.ItemsSource.Cast<T>())
@@ -105,8 +109,9 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     }
 
     private void ShowChanges() {
-        StringBuilder sb = new();
+        LocalData.Changes.Cleanup();
 
+        StringBuilder sb = new();
         sb.AppendLine("New Items:");
         foreach (T item in LocalData.Changes.AddedItems)
             sb.AppendLine($"  {item}");
@@ -125,11 +130,31 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     }
 
     private async Task UpdateRemoteItems() {
+        _updateResult.Text = "Updating...";
+        LocalData.Changes.Cleanup();
+        int successCount = 0;
 
+        if (Functions.Post is not null)
+            foreach (T item in LocalData.Changes.AddedItems)
+                if (await Functions.Post(item))
+                    successCount++;
+
+        if (Functions.Put is not null)
+            foreach (T item in LocalData.Changes.UpdatedItems)
+                if (await Functions.Put(item.Id, item))
+                    successCount++;
+
+        if (Functions.Delete is not null)
+            foreach (T item in LocalData.Changes.RemovedItems)
+                if (await Functions.Delete(item.Id))
+                    successCount++;
+
+        _updateResult.Text = $"{successCount}/{LocalData.Changes.Count} operations successfully performed";
+        await FillDataGrids();
     }
 
     private async Task<bool> FetchRemoteItems() {
-        _fetchResult.Text = $"Fetching...";
+        _fetchResult.Text = "Fetching...";
 
         if (Functions.NextId is not null)
             LocalData.RemoteNextItemId = await Functions.NextId() ?? 0;
