@@ -10,6 +10,14 @@ using System.Windows.Media;
 
 namespace AirportApp;
 
+internal sealed class Functions<T> {
+    public Func<Task<IEnumerable<T>?>>? Get { get; set; }
+    public Func<T, Task<bool>>? Post { get; set; }
+    public Func<int, T, Task<bool>>? Put { get; set; }
+    public Func<int, Task<bool>>? Delete { get; set; }
+    public Func<Task<int?>>? NextId { get; set; }
+}
+
 internal sealed class TableTab<T> : TabItem where T : IdModel {
     private Grid _content = new();
     private GlyphButton _deleteButton = new(0xE74D, Brushes.Red, 28) { Margin = new(2), IsEnabled = false };
@@ -21,13 +29,9 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
     public CustomGrid<T> LocalData { get; } = new() { MinRowHeight = 22, AutoGenerateColumns = false, CanUserResizeRows = false };
     public DataGrid RemoteData { get; } = new() { MinRowHeight = 22, AutoGenerateColumns = false, CanUserResizeRows = false, CanUserAddRows = false };
 
-    public Func<Task<IEnumerable<T>?>>? Get { get; set; }
-    public Func<T, Task<bool>>? Post { get; set; }
-    public Func<int, T, Task<bool>>? Put { get; set; }
-    public Func<int, Task<bool>>? Delete { get; set; }
-    public Func<Task<int?>>? NextId { get; set; }
+    public Functions<T> Functions { get; } = new();
 
-    public TableTab(string header, params DataGridColumn[] columns) {
+    public TableTab(string header, Functions<T> functions, params DataGridColumn[] columns) {
         DockPanel localPanel = new() { HorizontalAlignment = HorizontalAlignment.Left };
         localPanel.Children.Add(_deleteButton);
         localPanel.Children.Add(_undoAllButton);
@@ -69,6 +73,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
         _fetchButton.Click += (_, _) => _ = FetchRemoteItems();
         LocalData.SelectedCellsChanged += (_, _) => SelectionChanged();
 
+        Functions = functions;
         Header = new TextBlock { Text = header, Width = 64, Height = 16, TextAlignment = TextAlignment.Center };
         Content = _content;
 
@@ -101,11 +106,11 @@ internal sealed class TableTab<T> : TabItem where T : IdModel {
     private async Task<bool> FetchRemoteItems() {
         _fetchResult.Text = $"Fetching...";
 
-        if (NextId is not null)
-            LocalData.RemoteNextItemId = await NextId() ?? 0;
+        if (Functions.NextId is not null)
+            LocalData.RemoteNextItemId = await Functions.NextId() ?? 0;
 
-        if (Get is not null) {
-            IEnumerable<T>? data = await Get();
+        if (Functions.Get is not null) {
+            IEnumerable<T>? data = await Functions.Get();
             if (data is not null) {
                 _fetchResult.Text = $"Last fetched at {DateTime.Now.ToLongTimeString()}";
                 RemoteData.ItemsSource = data;
