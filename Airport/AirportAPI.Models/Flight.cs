@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace AirportAPI.Models;
 
-public sealed class Flight : IdModel {
+public sealed class Flight : IdModel, IEquatable<Flight> {
 
     [JsonPropertyName("airline_id"), JsonRequired]
     public int AirlineId { get; set; }
@@ -21,6 +22,17 @@ public sealed class Flight : IdModel {
 
     [JsonPropertyName("huf_per_km"), JsonRequired]
     public int HufPerKm { get; set; }
+
+    public bool Equals(Flight? other) {
+        return other is not null
+            && Id == other.Id
+            && AirlineId == other.AirlineId
+            && OriginId == other.OriginId
+            && DestinationId == other.DestinationId
+            && Distance == other.Distance
+            && FlightTime == other.FlightTime
+            && HufPerKm == other.HufPerKm;
+    }
 
     public override string ToString() => $"{OriginId} - {DestinationId} ({Id})";
 }
