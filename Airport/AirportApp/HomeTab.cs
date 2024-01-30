@@ -24,8 +24,6 @@ internal sealed class HomeTab : TabItem {
         panel.Children.Add(_okButton);
         panel.Children.Add(_resultText);
 
-        LinearGradientBrush brush = new(Color.FromRgb(220, 220, 225), Color.FromRgb(200, 200, 225), 90);
-
         Border border = new() {
             CornerRadius = new(8),
             Background = Brushes.White,
@@ -35,7 +33,7 @@ internal sealed class HomeTab : TabItem {
         };
 
         DockPanel content = new() {
-            Background = brush
+            Background = new LinearGradientBrush(Color.FromRgb(240, 240, 250), Color.FromRgb(200, 200, 240), 90)
         };
         content.Children.Add(border);
 

@@ -1,0 +1,70 @@
+services:
+  test-db:
+    container_name: airport-test-db
+    image: postgres:latest
+    volumes:
+      - ./initdb-test.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+    networks:
+      - test-net
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: airport
+  
+  test-api-build:
+    container_name: airport-test-api-build
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:8.0
+        COPY ./Airport/AirportAPI /build/AirportAPI
+        COPY ./Airport/AirportAPI.Models /build/AirportAPI.Models
+        WORKDIR /build/AirportAPI
+        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+    volumes:
+      - test-api-app:/app
+    networks:
+      - test-net
+  
+  test-api:
+    container_name: airport-test-api
+    depends_on:
+      test-db:
+        condition: service_started
+      test-api-build:
+        condition: service_completed_successfully
+    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    volumes:
+      - test-api-app:/app:ro
+    working_dir: /app
+    networks:
+      - test-net
+    environment:
+      CONNECTION_STRING: Host=test-db;Database=airport;Username=postgres;Password=postgres
+      ASPNETCORE_ENVIRONMENT: Development
+    entrypoint: "./AirportAPI"
+
+  test-api-tests:
+    container_name: airport-test-api-tests
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:8.0
+        COPY ./Airport/AirportAPI.Tests /app/AirportAPI.Tests
+        COPY ./Airport/AirportAPI.Models /app/AirportAPI.Models
+        WORKDIR /app/AirportAPI.Tests
+        ENTRYPOINT [ "dotnet", "test" ]
+    depends_on:
+      test-api:
+        condition: service_started
+    networks:
+      - test-net
+    environment:
+      API_ADDRESS: test-api
+
+volumes:
+  test-api-app:
+    name: airport-test-api-app
+
+networks:
+  test-net:
+    name: airport-test-network

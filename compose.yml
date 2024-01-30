@@ -6,6 +6,8 @@ services:
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
       - db-data:/var/lib/postgresql/data
+    networks:
+      - net
     ports:
       - 5432:5432
     environment:
@@ -24,6 +26,8 @@ services:
         ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
     volumes:
       - api-app:/app
+    networks:
+      - net
 
   api:
     container_name: airport-api
@@ -34,8 +38,10 @@ services:
         condition: service_completed_successfully
     image: mcr.microsoft.com/dotnet/aspnet:8.0
     volumes:
-      - api-app:/app
+      - api-app:/app:ro
     working_dir: /app
+    networks:
+      - net
     ports:
       - 5000:80
     environment:
@@ -50,6 +56,8 @@ services:
     volumes:
       - ./AirportWeb:/app
       - web-app:/app/dist
+    networks:
+      - net
     command: >
       bash -c "npm install &&
                npm run build &&
@@ -64,6 +72,8 @@ services:
     command: >
       /bin/bash -c "cat /usr/local/apache2/conf/httpd-custom.conf >> /usr/local/apache2/conf/httpd.conf &&
                     httpd-foreground"
+    networks:
+      - net
     ports:
       - "8080:80"
     depends_on:
@@ -76,3 +86,7 @@ volumes:
     name: airport-api-app
   web-app:
     name: airport-web-app
+
+networks:
+  net:
+    name: airport-network
