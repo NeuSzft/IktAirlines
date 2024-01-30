@@ -60,13 +60,18 @@ services:
       - net
     command: >
       bash -c "npm install &&
-               npm run build"
+               npm run build &&
+               cp /app/conf/.htaccess /app/dist"
 
   web:
     container_name: airport-web
     image: httpd:latest
     volumes:
       - web-app:/usr/local/apache2/htdocs/
+      - ./AirportWeb/conf/httpd-custom.conf:/usr/local/apache2/conf/httpd-custom.conf
+    command: >
+      /bin/bash -c "cat /usr/local/apache2/conf/httpd-custom.conf >> /usr/local/apache2/conf/httpd.conf &&
+                    httpd-foreground"
     networks:
       - net
     ports:

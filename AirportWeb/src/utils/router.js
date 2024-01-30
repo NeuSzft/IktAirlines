@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Booking from '@components/Booking.vue'
-import Summary from '@components/Summary.vue'
-import Home from '@components/Home.vue'
+import Booking from '@pages/Booking.vue'
+import Summary from '@pages/Summary.vue'
+import Home from '@pages/Home.vue'
 
 const routes = [
   { path: '/', component: Home, meta: { title: 'Home' } },
