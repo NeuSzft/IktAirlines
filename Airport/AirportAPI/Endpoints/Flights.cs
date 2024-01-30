@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Npgsql;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace AirportAPI.Endpoints;
 
 public static class Flights {
-    public static IEnumerable<Models.Flight> GetFlights(this DatabaseConnection db) {
+    public static IEnumerable<Models.Flight> GetFlights(this NpgsqlConnection connection) {
         const string query = """
             SELECT
                 id                  AS "Id",
@@ -22,11 +23,10 @@ public static class Flights {
             ORDER BY id;
         """;
 
-        using var con = db.Open();
-        return con.Query<Models.Flight>(query);
+        return connection.Query<Models.Flight>(query);
     }
 
-    public static IEnumerable<Models.FlightJoined> GetFlightsJoined(this DatabaseConnection db) {
+    public static IEnumerable<Models.FlightJoined> GetFlightsJoined(this NpgsqlConnection connection) {
         const string query = """
             SELECT
                 flights.id          AS "Id",
@@ -46,11 +46,10 @@ public static class Flights {
             ORDER BY flights.id;
         """;
 
-        using var con = db.Open();
-        return con.Query<Models.FlightJoined>(query);
+        return connection.Query<Models.FlightJoined>(query);
     }
 
-    public static Models.Flight? GetFlight(this DatabaseConnection db, int id) {
+    public static Models.Flight? GetFlight(this NpgsqlConnection connection, int id) {
         const string query = """
             SELECT
                 id                  AS "Id",
@@ -64,11 +63,10 @@ public static class Flights {
             WHERE flights.id = @Id;
         """;
 
-        using var con = db.Open();
-        return con.Query<Models.Flight>(query, new { Id = id }).FirstOrDefault();
+        return connection.Query<Models.Flight>(query, new { Id = id }).FirstOrDefault();
     }
 
-    public static Models.FlightJoined? GetFlightJoined(this DatabaseConnection db, int id) {
+    public static Models.FlightJoined? GetFlightJoined(this NpgsqlConnection connection, int id) {
         const string query = """
             SELECT
                 flights.id          AS "Id",
@@ -88,80 +86,92 @@ public static class Flights {
             WHERE flights.id = @Id;
         """;
 
-        using var con = db.Open();
-        return con.Query<Models.FlightJoined>(query, new { Id = id }).FirstOrDefault();
+        return connection.Query<Models.FlightJoined>(query, new { Id = id }).FirstOrDefault();
     }
 
-    public static int PostFlight(this DatabaseConnection db, Models.Flight flight) {
+    public static int PostFlight(this NpgsqlConnection connection, Models.Flight flight) {
         const string query = """
             INSERT INTO flights(airline_id, origin_id, destination_id, distance, flight_time, huf_per_km)
             VALUES (@AirlineId, @OriginId, @DestinationId, @Distance, @FlightTime, @HufPerKm);
         """;
 
-        using var con = db.Open();
-        return con.Execute(query, new { flight.AirlineId, flight.OriginId, flight.DestinationId, flight.Distance, flight.FlightTime, flight.HufPerKm });
+        return connection.Execute(query, new { flight.AirlineId, flight.OriginId, flight.DestinationId, flight.Distance, flight.FlightTime, flight.HufPerKm });
     }
 
-    public static int PutFlight(this DatabaseConnection db, int id, Models.Flight flight) {
+    public static int PutFlight(this NpgsqlConnection connection, int id, Models.Flight flight) {
         const string query = """
             UPDATE flights
             SET airline_id=@AirlineId, origin_id=@OriginId, destination_id=@DestinationId, distance=@Distance, flight_time=@FlightTime, huf_per_km=@HufPerKm
             WHERE flights.id = @Id;
         """;
 
-        using var con = db.Open();
-        return con.Execute(query, new { Id = id, flight.AirlineId, flight.OriginId, flight.DestinationId, flight.Distance, flight.FlightTime, flight.HufPerKm });
+        return connection.Execute(query, new { Id = id, flight.AirlineId, flight.OriginId, flight.DestinationId, flight.Distance, flight.FlightTime, flight.HufPerKm });
     }
 
-    public static int DelFlight(this DatabaseConnection db, int id) {
+    public static int DelFlight(this NpgsqlConnection connection, int id) {
         const string query = """
             DELETE FROM flights
             WHERE flights.id = @Id;
         """;
 
-        using var con = db.Open();
-        return con.Execute(query, new { Id = id });
+        return connection.Execute(query, new { Id = id });
     }
 
     public static void MapFlights(this WebApplication app) {
-        app.MapGet("/flights", (DatabaseConnection db) => Results.Ok(db.GetFlights()))
+        app.MapGet("/flights", (DatabaseConnection db) => {
+            using NpgsqlConnection connection = db.Open();
+            return Results.Ok(connection.GetFlights());
+        })
         .WithName("Get Flights")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
 
-        app.MapGet("/flights/joined", (DatabaseConnection db) => Results.Ok(db.GetFlightsJoined()))
+        app.MapGet("/flights/joined", (DatabaseConnection db) => {
+            using NpgsqlConnection connection = db.Open();
+            return Results.Ok(connection.GetFlightsJoined());
+        })
         .WithName("Get Flights Joined")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
 
         app.MapGet("/flights/{id}", (int id, DatabaseConnection db) => {
-            var item = db.GetFlight(id);
+            using NpgsqlConnection connection = db.Open();
+            var item = connection.GetFlight(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
         .WithName("Get Flight")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
-        .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
+        .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json")
+        .Produces(StatusCodes.Status404NotFound);
 
         app.MapGet("/flights/{id}/joined", (int id, DatabaseConnection db) => {
-            var item = db.GetFlightJoined(id);
+            using NpgsqlConnection connection = db.Open();
+            var item = connection.GetFlightJoined(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
         .WithName("Get Flight Joined")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
-        .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
+        .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json")
+        .Produces(StatusCodes.Status404NotFound);
 
-        app.MapPost("/flights", (Models.Flight flight, DatabaseConnection db) => db.PostFlight(flight) > 0 ? Results.Created() : Results.BadRequest())
+        app.MapPost("/flights", (Models.Flight flight, DatabaseConnection db) => {
+            using NpgsqlConnection connection = db.Open();
+            return connection.PostFlight(flight) > 0 ? Results.Created() : Results.BadRequest();
+        })
         .WithName("Post Flight")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest);
 
-        app.MapPut("/flights/{id}", (int id, Models.Flight flight, DatabaseConnection db) => db.PutFlight(id, flight) > 0 ? Results.Ok() : Results.NotFound())
+        app.MapPut("/flights/{id}", (int id, Models.Flight flight, DatabaseConnection db) => {
+            using NpgsqlConnection connection = db.Open();
+            return connection.PutFlight(id, flight) > 0 ? Results.Ok() : Results.NotFound();
+        })
         .WithName("Put Flight")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
@@ -169,7 +179,10 @@ public static class Flights {
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);
 
-        app.MapDelete("/flights/{id}", (int id, DatabaseConnection db) => db.DelFlight(id) > 0 ? Results.Ok() : Results.NotFound())
+        app.MapDelete("/flights/{id}", (int id, DatabaseConnection db) => {
+            using NpgsqlConnection connection = db.Open();
+            return connection.DelFlight(id) > 0 ? Results.Ok() : Results.NotFound();
+        })
         .WithName("Del Flight")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
