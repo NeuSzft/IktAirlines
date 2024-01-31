@@ -13,14 +13,14 @@
         <form id="bookingForm">
             <div class="row">
                 <div class="col-12 col-md-6 mb-3">
-                    <label for="originCity" class="form-label">Origin City</label>
-                    <select class="form-select" id="originCity" v-model="origin" required>
+                    <label for="origin-city" class="form-label">Origin City</label>
+                    <select class="form-select" id="origin-city" v-model="origin" required>
                         <option v-for="country of countriesOrigin" :key="country" :value="country">{{ country }}</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-6 mb-3">
-                    <label for="destinationCity" class="form-label">Destination City</label>
-                    <select class="form-select" id="destinationCity" v-model="destination" :disabled="origin === ''"
+                    <label for="destination-city" class="form-label">Destination City</label>
+                    <select class="form-select" id="destination-city" v-model="destination" :disabled="origin === ''"
                         required>
                         <option v-for="country of countriesDestination" :key="country" :value="country">{{ country }}
                         </option>
