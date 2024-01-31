@@ -10,6 +10,7 @@ x64/
 [Bb]uild[Ll]og.*
 
 .idea
+.vs
 
 *_i.c
 *_p.c
