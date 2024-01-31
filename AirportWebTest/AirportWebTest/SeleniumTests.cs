@@ -1,19 +1,22 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Remote;
 
 namespace AirportWebTest;
 
 [TestClass]
 public class SeleniumTests
 {
-    private const string Sut = "http://localhost:8080";
-    private WebDriver _webDriver = null!;
-
+    private const string SutHub = "http://localhost:4444";
+    private const string SutAirlines = "http://web-selenium:80";
+    private IWebDriver _webDriver = null!;
+    
     [TestInitialize]
     public void InitializeTest()
     {
-        _webDriver = new FirefoxDriver(new FirefoxOptions());
-        _webDriver.Url = Sut;
+        var firefoxOptions = new FirefoxOptions();
+        _webDriver = new RemoteWebDriver(new Uri(SutHub), firefoxOptions.ToCapabilities());
+        _webDriver.Url = SutAirlines;
     }
 
     [TestCleanup]
