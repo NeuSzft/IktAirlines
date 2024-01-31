@@ -1,0 +1,131 @@
+version: '3.8'
+services:
+  db-selenium:
+    container_name: airport-db-selenium
+    image: postgres:latest
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+      - db-data-selenium:/var/lib/postgresql/data
+    networks:
+      - net-selenium
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: airport
+
+  api-build-selenium:
+    container_name: airport-api-build-selenium
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:8.0
+        COPY ./Airport/AirportAPI /build/AirportAPI
+        COPY ./Airport/AirportAPI.Models /build/AirportAPI.Models
+        WORKDIR /build/AirportAPI
+        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+    volumes:
+      - api-app-selenium:/app
+    networks:
+      - net-selenium
+
+  api-selenium:
+    container_name: airport-api-selenium
+    depends_on:
+      db-selenium:
+        condition: service_started
+      api-build-selenium:
+        condition: service_completed_successfully
+    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    volumes:
+      - api-app-selenium:/app:ro
+    working_dir: /app
+    networks:
+      - net-selenium
+    ports:
+      - 5000:80
+    environment:
+      CONNECTION_STRING: Host=db;Database=airport;Username=postgres;Password=postgres
+      ASPNETCORE_ENVIRONMENT: Development
+    entrypoint: "./AirportAPI"
+
+  web-build-selenium:
+    container_name: airport-web-build-selenium
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - ./AirportWeb:/app
+      - web-app-selenium:/app/dist
+    networks:
+      - net-selenium
+    command: >
+      bash -c "npm install &&
+               npm run build &&
+               cp /app/conf/.htaccess /app/dist"
+
+  web-selenium:
+    container_name: airport-web-selenium
+    image: httpd:latest
+    volumes:
+      - web-app-selenium:/usr/local/apache2/htdocs/
+      - ./AirportWeb/conf/httpd-custom.conf:/usr/local/apache2/conf/httpd-custom.conf
+    command: >
+      /bin/bash -c "cat /usr/local/apache2/conf/httpd-custom.conf >> /usr/local/apache2/conf/httpd.conf &&
+                    httpd-foreground"
+    networks:
+      - net-selenium
+    ports:
+      - "8080:80"
+    depends_on:
+      web-build-selenium:
+        condition: service_completed_successfully
+      api-selenium:
+        condition: service_started
+
+  selenium-hub:
+    image: selenium/hub:4.0.0
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+    networks:
+      - net-selenium
+
+  node-firefox:
+    image: selenium/node-firefox:4.17.0-20240123
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_started
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - net-selenium
+
+  selenium-tests:
+    container_name: selenium-tests
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    volumes:
+      - ./AirportWebTest/AirportWebTest:/selenium-tests
+    depends_on:
+      selenium-hub:
+        condition: service_started
+      node-firefox:
+        condition: service_started
+      web-selenium:
+        condition: service_started
+    command: >
+      /bin/bash -c "dotnet test ./selenium-tests/AirportWebTest.csproj"
+
+volumes:
+  db-data-selenium:
+    name: airport-db-data-selenium
+  api-app-selenium:
+    name: airport-api-app-selenium
+  web-app-selenium:
+    name: airport-web-app-selenium
+
+networks:
+  net-selenium:
+    name: airport-network-selenium
