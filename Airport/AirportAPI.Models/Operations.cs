@@ -22,7 +22,7 @@ public abstract class OperationInfo(string operationName, string modelName) {
 }
 
 public abstract record Operation {
-    public static Operation? FromJson(JsonElement operationInfoElement) {
+    public static Operation FromJson(JsonElement operationInfoElement) {
         JsonElement operationName = operationInfoElement.GetProperty("operation_name");
         JsonElement modelName = operationInfoElement.GetProperty("model_name");
         JsonElement id = operationInfoElement.GetProperty("id");
@@ -31,15 +31,19 @@ public abstract record Operation {
         Assembly assembly = typeof(Operation).Assembly;
         string? assemblyName = assembly.GetName().Name;
 
-        Type? operationType = assembly.GetType($"{assemblyName}.{operationName.GetString()}");
-        Type? modelType = assembly.GetType($"{assemblyName}.{modelName.GetString()}");
+        string operationFullName = $"{assemblyName}.{operationName.GetString()}";
+        Type? operationType = assembly.GetType(operationFullName);
+        if (operationType is null)
+            throw new TypeLoadException(operationFullName);
 
-        if (operationType is null || modelType is null)
-            return null;
+        string modelFullName = $"{assemblyName}.{modelName.GetString()}";
+        Type? modelType = assembly.GetType(modelFullName);
+        if (modelType is null)
+            throw new TypeLoadException(modelFullName);
 
         Type type = operationType.MakeGenericType(modelType);
+        Operation operation = (Operation)Activator.CreateInstance(type)!;
 
-        Operation? operation = Activator.CreateInstance(type) as Operation;
         type.GetProperty("Id")?.SetValue(operation, id.GetInt32());
         type.GetProperty("Item")?.SetValue(operation, item.Deserialize(modelType));
 
@@ -48,7 +52,7 @@ public abstract record Operation {
 
     public static IEnumerable<Operation> FromJson(JsonDocument document) {
         if (document.RootElement.ValueKind == JsonValueKind.Array)
-            return document.RootElement.EnumerateArray().Select(FromJson).Where(x => x is not null)!;
+            return document.RootElement.EnumerateArray().Select(FromJson);
         return [];
     }
 }
