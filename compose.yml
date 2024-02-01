@@ -43,7 +43,7 @@ services:
     networks:
       - net
     ports:
-      - 5000:80
+      - 5000:5000
     environment:
       CONNECTION_STRING: Host=db;Database=airport;Username=postgres;Password=postgres
       ASPNETCORE_ENVIRONMENT: Development

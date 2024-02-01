@@ -29,7 +29,7 @@ internal static class Program {
         DatabaseConnection connection = new();
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        builder.WebHost.UseUrls("http://0.0.0.0:" + Environment.GetEnvironmentVariable(PortEnv) ?? "80");
+        builder.WebHost.UseUrls("http://0.0.0.0:" + Environment.GetEnvironmentVariable(PortEnv) ?? "5000");
 
         builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
