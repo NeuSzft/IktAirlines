@@ -56,7 +56,7 @@ public class SeleniumTests
     [DataRow("Beijing", "Los Angeles")]
     public void TryBooking(string origin, string destination)
     {
-        WebDriverWait wait = new(_webDriver, TimeSpan.FromMilliseconds(250));
+        WebDriverWait wait = new(_webDriver, TimeSpan.FromMilliseconds(3000));
 
         _webDriver.FindElement(By.CssSelector("a[href='/booking']")).Click();
 

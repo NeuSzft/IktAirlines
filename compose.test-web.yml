@@ -41,7 +41,7 @@ services:
     networks:
       - net-selenium
     environment:
-      CONNECTION_STRING: Host=db;Database=airport;Username=postgres;Password=postgres
+      CONNECTION_STRING: Host=db-selenium;Database=airport;Username=postgres;Password=postgres
       ASPNETCORE_ENVIRONMENT: Development
     entrypoint: "./AirportAPI"
 
