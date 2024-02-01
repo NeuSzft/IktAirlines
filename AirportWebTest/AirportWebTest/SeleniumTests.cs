@@ -9,16 +9,18 @@ namespace AirportWebTest;
 [TestClass]
 public class SeleniumTests
 {
-    private const string SutHub = "http://localhost:4444";
+    private const string SutHub = "http://selenium-hub:4444";
     private const string SutAirlines = "http://web-selenium:80";
     private IWebDriver _webDriver = null!;
-    
+
     [TestInitialize]
     public void InitializeTest()
     {
         var firefoxOptions = new FirefoxOptions();
         _webDriver = new RemoteWebDriver(new Uri(SutHub), firefoxOptions.ToCapabilities());
-        _webDriver.Url = SutAirlines;
+        _webDriver.Navigate().GoToUrl(SutAirlines);
+        //_webDriver = new FirefoxDriver(firefoxOptions);
+        //_webDriver.Navigate().GoToUrl("http://localhost:8080");
     }
 
     [TestCleanup]

@@ -8,8 +8,6 @@ services:
       - db-data-selenium:/var/lib/postgresql/data
     networks:
       - net-selenium
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: airport
@@ -42,8 +40,6 @@ services:
     working_dir: /app
     networks:
       - net-selenium
-    ports:
-      - 5000:80
     environment:
       CONNECTION_STRING: Host=db;Database=airport;Username=postgres;Password=postgres
       ASPNETCORE_ENVIRONMENT: Development
@@ -58,6 +54,8 @@ services:
       - web-app-selenium:/app/dist
     networks:
       - net-selenium
+    environment:
+      - VITE_API_URL=http://api-selenium:5000
     command: >
       bash -c "npm install &&
                npm run build &&
@@ -97,6 +95,8 @@ services:
       selenium-hub:
         condition: service_started
     environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
@@ -117,6 +117,8 @@ services:
         condition: service_started
     command: >
       /bin/bash -c "dotnet test ./selenium-tests/AirportWebTest.csproj"
+    networks:
+      - net-selenium
 
 volumes:
   db-data-selenium:
