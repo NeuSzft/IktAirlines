@@ -130,7 +130,7 @@ public static class Other {
             }
 
             transaction.Rollback();
-            return Results.UnprocessableEntity(exception.Message);
+            return exception is UnknownOperationException ? Results.UnprocessableEntity(exception.Message) : Results.BadRequest(exception.Message);
         })
         .WithName("Perform a transaction then roll back on error")
         .WithTags("Other Endpoints")
@@ -151,7 +151,11 @@ public static class Other {
             ModificationResults result = new(affected, connection.GetAirlines(), connection.GetCities(), connection.GetFlights());
 
             transaction.Rollback();
-            return exception is null ? Results.Ok(result) : Results.UnprocessableEntity(exception.Message);
+
+            if (exception is null)
+                return Results.Ok(affected);
+
+            return exception is UnknownOperationException ? Results.UnprocessableEntity(exception.Message) : Results.BadRequest(exception.Message);
         })
         .WithName("Perform a transaction then roll back")
         .WithTags("Other Endpoints")
