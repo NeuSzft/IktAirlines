@@ -20,12 +20,13 @@
                 </div>
             </div>
         </div>
-        <p class="card-footer fw-bold mb-0">Price: <span class="ticket-price">{{ calculateCost() }}</span> HUF</p>
+        <p class="card-footer fw-bold mb-0">Price: <span class="ticket-price">{{ price }}</span> HUF</p>
     </div>
 </template>
   
 <script>
 import { http } from "@utils/http"
+import { ref } from 'vue'
 
 export default {
     props: [
@@ -36,10 +37,20 @@ export default {
     ],
     mounted() {
         this.getFlight()
+        this.getPrice()
     },
     data() {
         return {
-            flight: null
+            flight: null,
+            price: ref(0),
+        }
+    },
+    watch: {
+        adults() {
+            this.getPrice()
+        },
+        children() {
+            this.getPrice()
         }
     },
     methods: {
@@ -49,37 +60,21 @@ export default {
                     this.flight = response.data
                 })
         },
-        calculateCost() {
-            let totalCost = 0
-            let baseCostPerPassenger = this.flight.distance * this.flight.huf_per_km
-
-            let totalBaseCostAdult = baseCostPerPassenger * this.adults
-            let totalBaseCostChild = baseCostPerPassenger * this.children
-
-            let destinationPop = this.flight.destination_city_population
-            let tourismTaxRate = destinationPop < 2000000 ? 0.05 : destinationPop < 10000000 ? 0.075 : 0.10
-
-            let vatAdult = totalBaseCostAdult * 0.27
-            let vatChild = totalBaseCostChild * 0.27
-            let keroseneTax = this.flight.distance * 0.10
-            let tourismTaxAdult = totalBaseCostAdult * tourismTaxRate
-            let tourismTaxChild = totalBaseCostChild * tourismTaxRate
-
-            let flightCostAdult = totalBaseCostAdult + vatAdult + keroseneTax + tourismTaxAdult
-            let flightCostChild = totalBaseCostChild + vatChild + keroseneTax + tourismTaxChild
-
-            if (this.adults + this.children > 10) {
-                flightCostAdult *= 0.90
-                flightCostChild *= 0.90
+        getPrice() {
+            if (this.adults + this.children < 1) {
+                this.price = 0
+                return
             }
-
-            totalCost += flightCostAdult + (flightCostChild * 0.8)
-
-            return (this.adults + this.children > 0) ? Math.round(totalCost) : 0
+            
+            http.post('/price', {
+                id: this.flightId,
+                adults: this.adults,
+                children: this.children
+            })
+            .then(response => {
+                this.price = response.data
+            })
         }
-    },
-    computed: {
-
     }
 }
 </script>
