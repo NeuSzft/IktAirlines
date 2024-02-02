@@ -3,13 +3,24 @@
         <h4 class="card-header fw-bold">{{ flight.origin_city }} → {{ flight.destination_city }}</h4>
         <div class="card-body">
             <h5 class="card-title mb-3">{{ flight.airline }}</h5>
-            <p class="card-text">Distance: {{ flight.distance }} km</p>
-            <p class="card-text">Price/km: {{ flight.huf_per_km }} HUF</p>
-            <p class="card-text">Passengers: {{ adults + children }}</p>
-            <p class="card-text">Adults: {{ adults }}</p>
-            <p class="card-text">Children: {{ children }}</p>
+            <div class="row d-flex">
+                <div class="col text-start">
+                    <p class="card-text">Distance:</p>
+                    <p class="card-text">Price/km:</p>
+                    <p class="card-text">Passengers:</p>
+                    <p class="card-text">Adults:</p>
+                    <p class="card-text">Children: </p>
+                </div>
+                <div class="col text-end fw-bold">
+                    <p class="card-text distance">{{ flight.distance }} km</p>
+                    <p class="card-text price-per-km">{{ flight.huf_per_km }} HUF</p>
+                    <p class="card-text">{{ adults + children }}</p>
+                    <p class="card-text adults-count">{{ adults }}</p>
+                    <p class="card-text children-count">{{ children }}</p>
+                </div>
+            </div>
         </div>
-        <p class="card-footer fw-bold mb-0">Price: {{ calculateCost() }} HUF</p>
+        <p class="card-footer fw-bold mb-0">Price: <span class="ticket-price">{{ calculateCost() }}</span> HUF</p>
     </div>
 </template>
   
@@ -43,7 +54,7 @@ export default {
             let baseCostPerPassenger = this.flight.distance * this.flight.huf_per_km
 
             let totalBaseCostAdult = baseCostPerPassenger * this.adults
-            let totalBaseCostChild = baseCostPerPassenger * this.children 
+            let totalBaseCostChild = baseCostPerPassenger * this.children
 
             let destinationPop = this.flight.destination_city_population
             let tourismTaxRate = destinationPop < 2000000 ? 0.05 : destinationPop < 10000000 ? 0.075 : 0.10

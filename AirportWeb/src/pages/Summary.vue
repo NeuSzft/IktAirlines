@@ -5,7 +5,7 @@
             <div class="row my-4 card" v-for="(ticket, index) in tickets" :key="index" :id="`ticket-${index}`">
                 <div class="card py-3">
                     <div class="fw-bold d-flex flex-wrap text-center text-lg-start justify-content-center justify-content-lg-between">
-                        <div class="col-12 col-lg-9 mt-0 mb-3 mb-lg-0 align-self-center fs-3">
+                        <div class="col-12 col-lg-8 col-xl-9 mt-0 mb-3 mb-lg-0 align-self-center fs-3">
                             <span class="origin-destination">{{ tickets[index].route.origin }}→{{ tickets[index].route.final }}</span>
                         </div>
                         <div class="col d-flex flex-wrap gap-1 mx-1 justify-content-center align-self-center">
@@ -23,7 +23,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-1 pt-3 pt-lg-0">
+                        <div class="col-12 col-lg-1 ms-0 pt-3 pt-lg-0">
                             <button type="button" class="btn border border-2 rounded align-middle w-100 h-100 p-3"
                                 @click="toggleTickets(index)">
                                 <i :class="showTickets[index] ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
