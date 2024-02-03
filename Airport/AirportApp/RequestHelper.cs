@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AirportAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -63,6 +64,18 @@ internal sealed class RequestHelper(string baseAddress) : IDisposable {
             return (await _client.GetAsync("/ping")).IsSuccessStatusCode;
         } catch {
             return false;
+        }
+    }
+
+    public async Task<string> Modify(IEnumerable<OperationInfo> operations) {
+        try {
+            HttpResponseMessage response = await _client.PatchAsJsonAsync("/modify", operations);
+            string content = await response.Content.ReadAsStringAsync();
+            string result = response.IsSuccessStatusCode ? $"Successfully performed {int.Parse(content)} operations" : $"\n{content}";
+            return $"{response.StatusCode} ({(int)response.StatusCode}) {result}";
+        } catch (Exception e) {
+            ShowRequestError("DELETE", "/modify", e);
+            return e.Message;
         }
     }
 

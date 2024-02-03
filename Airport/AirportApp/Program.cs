@@ -19,7 +19,8 @@ internal class Wnd : Window {
                 Post = (airline) => helper.Post("/airlines", airline),
                 Put = (id, airline) => helper.Put($"/airlines/{id}", airline),
                 Delete = (id) => helper.Delete($"/airlines/{id}"),
-                NextId = () => helper.NextId("/next-id/airlines")
+                NextId = () => helper.NextId("/next-id/airlines"),
+                Modify = helper.Modify
             },
             new DataGridTextColumn { Header = "Id", IsReadOnly = true, Binding = new Binding("Id") },
             new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") }
@@ -32,7 +33,8 @@ internal class Wnd : Window {
                 Post = (city) => helper.Post("/cities", city),
                 Put = (id, city) => helper.Put($"/cities/{id}", city),
                 Delete = (id) => helper.Delete($"/cities/{id}"),
-                NextId = () => helper.NextId("/next-id/cities")
+                NextId = () => helper.NextId("/next-id/cities"),
+                Modify = helper.Modify
             },
             new DataGridTextColumn { Header = "Id", IsReadOnly = true, Binding = new Binding("Id") },
             new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") },
@@ -50,7 +52,8 @@ internal class Wnd : Window {
                 Post = (flight) => helper.Post("/flights", flight),
                 Put = (id, flight) => helper.Put($"/flights/{id}", flight),
                 Delete = (id) => helper.Delete($"/flights/{id}"),
-                NextId = () => helper.NextId("/next-id/flights")
+                NextId = () => helper.NextId("/next-id/flights"),
+                Modify = helper.Modify
             },
             new DataGridTextColumn { Header = "Id", IsReadOnly = true, Binding = new Binding("Id") },
             airlineIdColumn,
@@ -61,10 +64,10 @@ internal class Wnd : Window {
             new DataGridTextColumn { Header = "Ft/Km", Binding = new Binding("HufPerKm") }
         );
 
-        airlinesTab.LocalData.ItemList.CollectionChanged += (_, _) => airlineIdColumn.ItemsSource = airlinesTab.LocalData.ItemIds;
-        citiesTab.LocalData.ItemList.CollectionChanged += (_, _) => {
-            originIdColumn.ItemsSource = citiesTab.LocalData.ItemIds;
-            destinationIdColumn.ItemsSource = citiesTab.LocalData.ItemIds;
+        airlinesTab.Grid.ItemList.CollectionChanged += (_, _) => airlineIdColumn.ItemsSource = airlinesTab.Grid.ItemIds;
+        citiesTab.Grid.ItemList.CollectionChanged += (_, _) => {
+            originIdColumn.ItemsSource = citiesTab.Grid.ItemIds;
+            destinationIdColumn.ItemsSource = citiesTab.Grid.ItemIds;
         };
 
         TabControl content = new() { Margin = new(0, 8, 0, 0) };

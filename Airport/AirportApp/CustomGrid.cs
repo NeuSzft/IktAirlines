@@ -4,8 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace AirportApp;
 
@@ -56,9 +58,26 @@ internal class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> {
             if (e.OldItems is not null)
                 foreach (T item in e.OldItems.OfType<T>())
                     Changes.RemovedItems.Add(item);
+
+            Changes.Cleanup();
         };
 
+        AutoGenerateColumns = false;
+        VerticalAlignment = VerticalAlignment.Top;
+        CanUserDeleteRows = false;
+        CanUserResizeRows = false;
+
         base.ItemsSource = ItemList;
+    }
+
+    public void MarkItemsAsDeleted(IEnumerable<T> items) {
+        foreach (var item in items) {
+            Changes.RemovedItems.Add(item);
+            if (ItemContainerGenerator.ContainerFromItem(item) is DataGridRow row)
+                row.Background = DimmedBrush(Brushes.Red);
+        }
+
+        Changes.Cleanup();
     }
 
     protected override void OnAddingNewItem(AddingNewItemEventArgs e) {
@@ -74,13 +93,48 @@ internal class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> {
 
     protected override void OnBeginningEdit(DataGridBeginningEditEventArgs e) {
         if (e.Row.DataContext is T item)
-            LastEditedItemValue = item.Clone() as T;
+            LastEditedItemValue = (T)item.Clone();
+
         base.OnBeginningEdit(e);
     }
 
     protected override void OnExecutedCommitEdit(ExecutedRoutedEventArgs e) {
         base.OnExecutedCommitEdit(e);
-        if (e.OriginalSource is DataGridCell cell && cell.DataContext is T item && !item.Equals(LastEditedItemValue))
+
+        if (e.OriginalSource is DataGridCell cell && cell.DataContext is T item && !item.Equals(LastEditedItemValue)) {
             Changes.UpdatedItems.Add(item);
+            Changes.Cleanup();
+
+            if (!Changes.AddedItems.Contains(item) && !Changes.RemovedItems.Contains(item)) {
+                DependencyObject parent = VisualTreeHelper.GetParent(cell);
+
+                while (parent is not null && parent is not DataGridRow)
+                    parent = VisualTreeHelper.GetParent(parent);
+
+                if (parent is not null && parent is DataGridRow row)
+                    row.Background = DimmedBrush(Brushes.Yellow);
+            }
+        }
+    }
+
+    protected override void OnLoadingRow(DataGridRowEventArgs e) {
+        if (e.Row.DataContext is T item) {
+            if (Changes.AddedItems.Contains(item))
+                e.Row.Background = DimmedBrush(Brushes.Green);
+            else if (Changes.UpdatedItems.Contains(item))
+                e.Row.Background = DimmedBrush(Brushes.Yellow);
+            else if (Changes.RemovedItems.Contains(item))
+                e.Row.Background = DimmedBrush(Brushes.Red);
+            else
+                e.Row.Background = Brushes.White;
+        }
+
+        base.OnLoadingRow(e);
+    }
+
+    private SolidColorBrush DimmedBrush(SolidColorBrush brush) {
+        Color color = brush.Color;
+        color.A /= 2;
+        return new(color);
     }
 }
