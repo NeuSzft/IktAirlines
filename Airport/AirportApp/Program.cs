@@ -41,9 +41,9 @@ internal class Wnd : Window {
             new DataGridTextColumn { Header = "Population", Binding = new Binding("Population") }
         );
 
-        DataGridComboBoxColumn airlineIdColumn = new() { Header = "Airline Id", SelectedValueBinding = new Binding("AirlineId") };
-        DataGridComboBoxColumn originIdColumn = new() { Header = "Origin City Id", SelectedValueBinding = new Binding("OriginId") };
-        DataGridComboBoxColumn destinationIdColumn = new() { Header = "Destination City Id", SelectedValueBinding = new Binding("DestinationId") };
+        CustomGridComboBoxColumn<Airline> airlineIdColumn = new(airlinesTab.Grid.ItemList) { Header = "Airline Id", SelectedValueBinding = new Binding("AirlineId") };
+        CustomGridComboBoxColumn<City> originIdColumn = new(citiesTab.Grid.ItemList) { Header = "Origin City Id", SelectedValueBinding = new Binding("OriginId") };
+        CustomGridComboBoxColumn<City> destinationIdColumn = new(citiesTab.Grid.ItemList) { Header = "Destination City Id", SelectedValueBinding = new Binding("DestinationId") };
 
         TableTab<Flight> flightsTab = new(
             "Flights",

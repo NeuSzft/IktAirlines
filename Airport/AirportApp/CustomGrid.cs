@@ -3,15 +3,54 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
 namespace AirportApp;
 
-internal class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> {
+internal sealed class CustomGridComboBoxColumn<T> : DataGridComboBoxColumn where T : IdModel {
+    private class ValueConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            return ((IEnumerable<T>)parameter).FirstOrDefault(x => x.Id.Equals(value))?.ToString() ?? value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null!;
+    }
+
+    public IEnumerable<T> ForeignItems;
+
+    public CustomGridComboBoxColumn(IEnumerable<T> foreignItems) => ForeignItems = foreignItems;
+
+    private void SetTemplate(ComboBox box) {
+        FrameworkElementFactory factory = new(typeof(TextBlock));
+        factory.SetBinding(TextBlock.TextProperty, new Binding() {
+            Converter = new ValueConverter(),
+            ConverterParameter = ForeignItems,
+        });
+        box.ItemTemplate = new DataTemplate { VisualTree = factory };
+    }
+
+    protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem) {
+        FrameworkElement element = base.GenerateElement(cell, dataItem);
+        if (element is ComboBox box)
+            SetTemplate(box);
+        return element;
+    }
+
+    protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem) {
+        FrameworkElement element = base.GenerateEditingElement(cell, dataItem);
+        if (element is ComboBox box)
+            SetTemplate(box);
+        return element;
+    }
+}
+
+internal sealed class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> {
     internal class ItemListChanges {
         public HashSet<T> AddedItems { get; } = new();
         public HashSet<T> UpdatedItems { get; } = new();
@@ -63,9 +102,9 @@ internal class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> {
         };
 
         AutoGenerateColumns = false;
-        VerticalAlignment = VerticalAlignment.Top;
         CanUserDeleteRows = false;
         CanUserResizeRows = false;
+        VerticalAlignment = VerticalAlignment.Top;
 
         base.ItemsSource = ItemList;
     }
