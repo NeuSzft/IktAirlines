@@ -7,12 +7,14 @@ using System.Windows.Media;
 namespace AirportApp;
 
 internal sealed class HomeTab : TabItem {
-    TextBox _addressBox = new() { Margin = new(16, 16, 16, 0), FontSize = 15, BorderThickness = new(2) };
+    Border _addressBorder = new() { Margin = new(16, 16, 16, 0), BorderThickness = new(1), CornerRadius = new(2) };
+    TextBox _addressBox = new() { FontSize = 15, BorderThickness = new(0), Background = Brushes.Transparent };
     CustomButton _okButton = new("Set", 15) { Margin = new(16) };
     TextBlock _resultText = new() { Margin = new(16, 0, 16, 16), Text = "Not set yet" };
 
     public HomeTab(RequestHelper helper, params Func<Task<bool>>[] tableFetchers) {
         _addressBox.Text = helper.BaseAddress.ToString();
+        _addressBorder.Child = _addressBox;
 
         _okButton.Click += (_, _) => _ = SetBaseAddressAndFetch(helper, tableFetchers);
 
@@ -20,7 +22,7 @@ internal sealed class HomeTab : TabItem {
             MinWidth = 256,
             Margin = new(2)
         };
-        panel.Children.Add(_addressBox);
+        panel.Children.Add(_addressBorder);
         panel.Children.Add(_okButton);
         panel.Children.Add(_resultText);
 
@@ -40,16 +42,23 @@ internal sealed class HomeTab : TabItem {
         Margin = new(4, 0, 0, 0);
         Header = new TextBlock { Text = "Home", Width = 64, Height = 16, TextAlignment = TextAlignment.Center };
         Content = content;
+
+        SetAddressColor(Brushes.LightGray);
+    }
+
+    private void SetAddressColor(SolidColorBrush brush) {
+        _addressBorder.BorderBrush = brush;
+        _addressBorder.Background = brush.AdjustAlpha(0.3);
     }
 
     private async Task SetBaseAddressAndFetch(RequestHelper helper, Func<Task<bool>>[] tableFetchers) {
         helper.SetBaseAddress(_addressBox.Text);
 
-        _addressBox.BorderBrush = Brushes.Gold;
+        SetAddressColor(Brushes.Gold);
         _resultText.Text = "Pinging...";
 
         if (!await helper.Ping()) {
-            _addressBox.BorderBrush = Brushes.Red;
+            SetAddressColor(Brushes.Red);
             _resultText.Text = $"Failed to reach API server";
             return;
         }
@@ -63,7 +72,7 @@ internal sealed class HomeTab : TabItem {
                 success++;
         }
 
-        _addressBox.BorderBrush = success == tableFetchers.Length ? Brushes.Green : Brushes.Red;
+        SetAddressColor(success == tableFetchers.Length ? Brushes.LightGreen : Brushes.Red);
         _resultText.Text = $"Successfully set and queried ({success}/{tableFetchers.Length}) tables";
     }
 }

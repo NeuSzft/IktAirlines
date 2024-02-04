@@ -98,4 +98,10 @@ internal class Wnd : Window {
 internal static class Program {
     [STAThread]
     private static void Main() => new Application().Run(new Wnd());
+
+    internal static SolidColorBrush AdjustAlpha(this SolidColorBrush brush, double multiplier) {
+        Color color = brush.Color;
+        color.A = (byte)(color.A * multiplier);
+        return new(color);
+    }
 }

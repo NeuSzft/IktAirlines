@@ -113,7 +113,7 @@ internal sealed class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> 
         foreach (var item in items) {
             Changes.RemovedItems.Add(item);
             if (ItemContainerGenerator.ContainerFromItem(item) is DataGridRow row)
-                row.Background = DimmedBrush(Brushes.Red);
+                row.Background = Brushes.Red.AdjustAlpha(0.5);
         }
 
         Changes.Cleanup();
@@ -151,7 +151,7 @@ internal sealed class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> 
                     parent = VisualTreeHelper.GetParent(parent);
 
                 if (parent is not null && parent is DataGridRow row)
-                    row.Background = DimmedBrush(Brushes.Yellow);
+                    row.Background = Brushes.Yellow.AdjustAlpha(0.5);
             }
         }
     }
@@ -159,21 +159,15 @@ internal sealed class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> 
     protected override void OnLoadingRow(DataGridRowEventArgs e) {
         if (e.Row.DataContext is T item) {
             if (Changes.AddedItems.Contains(item))
-                e.Row.Background = DimmedBrush(Brushes.Green);
+                e.Row.Background = Brushes.Green.AdjustAlpha(0.5);
             else if (Changes.UpdatedItems.Contains(item))
-                e.Row.Background = DimmedBrush(Brushes.Yellow);
+                e.Row.Background = Brushes.Yellow.AdjustAlpha(0.5);
             else if (Changes.RemovedItems.Contains(item))
-                e.Row.Background = DimmedBrush(Brushes.Red);
+                e.Row.Background = Brushes.Red.AdjustAlpha(0.5);
             else
                 e.Row.Background = Brushes.White;
         }
 
         base.OnLoadingRow(e);
-    }
-
-    private SolidColorBrush DimmedBrush(SolidColorBrush brush) {
-        Color color = brush.Color;
-        color.A /= 2;
-        return new(color);
     }
 }
