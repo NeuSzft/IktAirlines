@@ -1,73 +1,79 @@
 <template>
-    <div v-if="isPurchased"
-        class="alert alert-success position-fixed z-1 translate-middle top-25 start-50 w-75 fs-5 text-center" role="alert">
-        <i class="bi bi-check-circle"></i>
-        <span>
-            Flight for <router-link :to="ticketLink" aria-current="page" class="alert-link d-inline fw-bold">{{ origin }} →
-                {{ destination }}</router-link> has been booked!
-        </span>
-    </div>
-
-    <div id="booking" class="container mt-5">
-        <h1 class="text-center mb-4">Flight Booking</h1>
-        <form id="bookingForm">
-            <div class="row">
-                <div class="col-12 col-md-6 mb-3">
-                    <label for="origin-city" class="form-label">Origin City</label>
-                    <select class="form-select" id="origin-city" v-model="origin" required>
-                        <option v-for="country of countriesOrigin" :key="country" :value="country">{{ country }}</option>
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 mb-3">
-                    <label for="destination-city" class="form-label">Destination City</label>
-                    <select class="form-select" id="destination-city" v-model="destination" :disabled="origin === ''"
-                        required>
-                        <option v-for="country of countriesDestination" :key="country" :value="country">{{ country }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-12 col-md-6 mb-3">
-                    <label for="passengers" class="form-label">Number of adults</label>
-                    <input type="number" class="form-control" id="passengers" v-model="adultsCount" min="0" required>
-                </div>
-                <div class="col-12 col-md-6 mb-3">
-                    <label for="children" class="form-label">Number of children</label>
-                    <input type="number" class="form-control" id="children" v-model="childrenCount" min="0" required>
-                </div>
-            </div>
-        </form>
-
-        <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null">
-            <template v-for="route in routes.filter(x => x.final === destination)" :key="route.final">
-                <div class="w-100 d-flex flex-wrap border rounded my-3">
-                    <div class="col-12 col-md d-flex flex-wrap gap-3 justify-content-center  tickets">
-                        <Ticket v-for="id in route.flightIds" :key="id" :flightId="id" :adults="adultsCount"
-                            :children="childrenCount" class="col-sm-12 col-lg" />
-                    </div>
-                    <div class="d-flex flex-column col-12 col-lg-2 mt-2 mt-lg-0 ms-lg-3 text-center">
-                        <div class="col-12 mt-lg-3">
-                            <p class="fs-3 ">{{ calculateCost(route) }} HUF</p>
-                        </div>
-                        <div class="col">
-                            <button type="button" :id="route.flightIds" :key="route.flightIds"
-                                :disabled="adultsCount + childrenCount < 1" @click="buyTicket(route)"
-                                class="btn btn-outline-success w-100 h-100 fs-1 fw-bolder">
-                                <i class="bi bi-basket2-fill"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </template>
+    <PageLayout>
+        <div v-if="isPurchased"
+            class="alert alert-success position-fixed z-1 translate-middle top-25 start-50 w-75 fs-5 text-center"
+            role="alert">
+            <i class="bi bi-check-circle"></i>
+            <span>
+                Flight for <router-link :to="ticketLink" aria-current="page" class="alert-link d-inline fw-bold">{{ origin
+                }} →
+                    {{ destination }}</router-link> has been booked!
+            </span>
         </div>
-    </div>
+
+        <div id="booking" class="container mt-5">
+            <h1 class="text-center mb-4">Flight Booking</h1>
+            <form id="bookingForm">
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="origin-city" class="form-label">Origin City</label>
+                        <select class="form-select" id="origin-city" v-model="origin" required>
+                            <option v-for="country of countriesOrigin" :key="country" :value="country">{{ country }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="destination-city" class="form-label">Destination City</label>
+                        <select class="form-select" id="destination-city" v-model="destination" :disabled="origin === ''"
+                            required>
+                            <option v-for="country of countriesDestination" :key="country" :value="country">{{ country }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="passengers" class="form-label">Number of adults</label>
+                        <input type="number" class="form-control" id="passengers" v-model="adultsCount" min="0" required>
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="children" class="form-label">Number of children</label>
+                        <input type="number" class="form-control" id="children" v-model="childrenCount" min="0" required>
+                    </div>
+                </div>
+            </form>
+
+            <div id="flight" class="container d-flex flex-wrap" v-if="destination !== null">
+                <template v-for="route in routes.filter(x => x.final === destination)" :key="route.final">
+                    <div class="w-100 d-flex flex-wrap border rounded my-3">
+                        <div class="col-12 col-md d-flex flex-wrap gap-3 justify-content-center  tickets">
+                            <Ticket v-for="id in route.flightIds" :key="id" :flightId="id" :adults="adultsCount"
+                                :children="childrenCount" class="col-sm-12 col-lg" />
+                        </div>
+                        <div class="d-flex flex-column col-12 col-lg-2 mt-2 mt-lg-0 ms-lg-3 text-center">
+                            <div class="col-12 mt-lg-3">
+                                <p class="fs-3 ">{{ calculateCost(route) }} HUF</p>
+                            </div>
+                            <div class="col">
+                                <button type="button" :id="route.flightIds" :key="route.flightIds"
+                                    :disabled="adultsCount + childrenCount < 1" @click="buyTicket(route)"
+                                    class="btn btn-outline-success w-100 h-100 fs-1 fw-bolder">
+                                    <i class="bi bi-basket2-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </PageLayout>
 </template>
   
 <script>
 import { ref, toRaw } from 'vue'
 import { http } from "@utils/http"
 import Ticket from "@components/Ticket.vue"
+import PageLayout from '@layouts/PageLayout.vue'
 
 export default {
     mounted() {
@@ -248,7 +254,8 @@ export default {
         }
     },
     components: {
-        Ticket
+        Ticket,
+        PageLayout
     }
 }
 </script>
