@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Routing;
 using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json;
 
 namespace AirportAPI.Endpoints;
@@ -104,16 +103,14 @@ public static class Other {
                 double flightCostAdult = totalBaseCostAdult + vatAdult + keroseneTax + tourismTaxAdult;
                 double flightCostChild = totalBaseCostChild + vatChild + keroseneTax + tourismTaxChild;
 
-                if (ticket.AdultsCount + ticket.ChildrenCount > 10)
-                {
+                if (ticket.AdultsCount + ticket.ChildrenCount > 10) {
                     flightCostAdult *= 0.90;
                     flightCostChild *= 0.90;
                 }
 
                 price += Math.Round(flightCostAdult + (flightCostChild * 0.8));
                 return Results.Ok(price);
-            }
-            catch (JsonException) {
+            } catch (JsonException) {
                 return Results.BadRequest("Invalid JSON data.");
             }
         })
@@ -164,8 +161,13 @@ public static class Other {
         .Produces(StatusCodes.Status404NotFound);
 
         app.MapPatch("/modify", async (DatabaseConnection db, HttpRequest request) => {
-            using JsonDocument document = await JsonDocument.ParseAsync(request.Body);
-            IEnumerable<Operation> operations = Operation.FromJson(document);
+            IEnumerable<Operation> operations;
+            try {
+                using JsonDocument document = await JsonDocument.ParseAsync(request.Body);
+                operations = Operation.FromJson(document);
+            } catch (Exception e) {
+                return Results.BadRequest(e.Message);
+            }
 
             using NpgsqlConnection connection = db.Open();
             using NpgsqlTransaction transaction = connection.BeginTransaction();
@@ -189,8 +191,13 @@ public static class Other {
         .Produces<string>(StatusCodes.Status422UnprocessableEntity, "text/plain");
 
         app.MapPatch("/modify/test", async (DatabaseConnection db, HttpRequest request) => {
-            using JsonDocument document = await JsonDocument.ParseAsync(request.Body);
-            IEnumerable<Operation> operations = Operation.FromJson(document);
+            IEnumerable<Operation> operations;
+            try {
+                using JsonDocument document = await JsonDocument.ParseAsync(request.Body);
+                operations = Operation.FromJson(document);
+            } catch (Exception e) {
+                return Results.BadRequest(e.Message);
+            }
 
             using NpgsqlConnection connection = db.Open();
             using NpgsqlTransaction transaction = connection.BeginTransaction();
@@ -201,7 +208,7 @@ public static class Other {
             transaction.Rollback();
 
             if (exception is null)
-                return Results.Ok(affected);
+                return Results.Ok(result);
 
             return exception is UnknownOperationException ? Results.UnprocessableEntity(exception.Message) : Results.BadRequest(exception.Message);
         })
