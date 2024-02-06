@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.Json;
+using Newtonsoft.Json;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Remote;
@@ -13,6 +16,8 @@ public class SeleniumTests
     private const string SutAirlines = "http://web-selenium:80";
     private IWebDriver _webDriver = null!;
     private WebDriverWait _wait = null!;
+    private readonly HttpClient _httpClient = new();
+    private const string ApiUrl = "http://api-selenium:5000";
 
     [TestInitialize]
     public void InitializeTest()
@@ -297,15 +302,44 @@ public class SeleniumTests
         _wait.Until(ExpectedConditions.ElementIsVisible(By.Id(ticketId)));
 
         Assert.IsTrue(true);
-        //TODO: Get from the api every ticket, then sum up and check the: Total distance, Total flight time and Total cost
     }
 
-
     [TestMethod]
-    [DataRow("Bangkok", "Tehran")]
-    public void TestBookingConfirmation(string origin, string destination)
+    [DataRow("Toronto", "New York")]
+    public async Task TestDisplayedCardPriceFromTheApi(string origin, string destination)
     {
-        // Your test code for booking confirmation and API validation
+        _webDriver.FindElement(By.CssSelector("a[href='/booking']")).Click();
+
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#origin-city option")));
+
+        _webDriver.FindElement(By.Id("origin-city")).Click();
+        _webDriver.FindElement(By.CssSelector($"#origin-city option[value='{origin}']")).Click();
+
+        _webDriver.FindElement(By.Id("destination-city")).Click();
+        _webDriver.FindElement(By.CssSelector($"#destination-city option[value='{destination}']")).Click();
+
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("tickets")));
+
+        _webDriver.FindElement(By.Id("passengers")).SendKeys("1");
+
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.Id("flight")));
+
+        var ticket = _webDriver.FindElement(By.CssSelector(".tickets>div"));
+        int priceTicket = int.Parse(ticket.FindElement(By.ClassName("ticket-price")).Text);
+
+        var priceApi = await GetPriceFromApi(
+            int.Parse(ticket.GetAttribute("id")),
+            int.Parse(ticket.FindElement(By.ClassName("adults-count")).Text),
+            int.Parse(ticket.FindElement(By.ClassName("children-count")).Text)
+        );
+        
+        Assert.AreEqual(priceApi, priceTicket);
+    }
+    
+    [TestMethod]
+    [DataRow("Toronto", "New York")]
+    public async Task TestBookingTotalPriceByApi(string origin, string destination)
+    {
         _webDriver.FindElement(By.CssSelector("a[href='/booking']")).Click();
 
         _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#origin-city option")));
@@ -322,7 +356,6 @@ public class SeleniumTests
 
         _webDriver.FindElement(By.CssSelector(".btn-outline-success")).Click();
         _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".alert-success")));
-        Assert.AreEqual(true, _webDriver.FindElement(By.CssSelector(".alert-success")).Displayed);
 
         string ticketUrl = _webDriver.FindElement(By.CssSelector(".alert-success a")).GetAttribute("href");
         string ticketId = ticketUrl.Split('#')[^1];
@@ -335,10 +368,134 @@ public class SeleniumTests
         _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector($"#{ticketId} .tickets")));
 
         var tickets = ticket.FindElements(By.CssSelector(".tickets .card")).ToList();
-        var ticketsIds = tickets.Select(x => x.GetAttribute("id"));
+        int totalPrice = tickets.Select(x => x.FindElement(By.ClassName("ticket-price")).Text).Select(int.Parse).Sum();
+        List<int> ticketsIds = tickets.Select(x => x.GetAttribute("id")).Select(int.Parse).ToList();
+        List<int> adultCounts = tickets.Select(x => x.FindElement(By.ClassName("adults-count")).Text).Select(int.Parse).ToList();
+        List<int> childrenCounts = tickets.Select(x => x.FindElement(By.ClassName("children-count")).Text).Select(int.Parse).ToList();
+        List<int> pricesApi = new();
+        
+        for (int i = 0; i < ticketsIds.Count; i++)
+        {
+            pricesApi.Add(await GetPriceFromApi(ticketsIds[i], adultCounts[i], childrenCounts[i]));    
+        }
+        
+        Assert.AreEqual(pricesApi.Sum(), totalPrice);
+    }
+    
+    [TestMethod]
+    [DataRow("Toronto", "New York")]
+    public void TestBookingTotalDistance(string origin, string destination)
+    {
+        _webDriver.FindElement(By.CssSelector("a[href='/booking']")).Click();
 
-        // var ticketsDistance = tickets.Select(x => x.GetAttribute("id"));
-        // var ticketAdult = tickets.Select(x => x.GetAttribute("id"));
-        // var ticketChildren = tickets.Select(x => x.GetAttribute("id"));
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#origin-city option")));
+
+        _webDriver.FindElement(By.Id("origin-city")).Click();
+        _webDriver.FindElement(By.CssSelector($"#origin-city option[value='{origin}']")).Click();
+
+        _webDriver.FindElement(By.Id("destination-city")).Click();
+        _webDriver.FindElement(By.CssSelector($"#destination-city option[value='{destination}']")).Click();
+
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("tickets")));
+
+        _webDriver.FindElement(By.Id("passengers")).SendKeys("1");
+
+        _webDriver.FindElement(By.CssSelector(".btn-outline-success")).Click();
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".alert-success")));
+
+        string ticketUrl = _webDriver.FindElement(By.CssSelector(".alert-success a")).GetAttribute("href");
+        string ticketId = ticketUrl.Split('#')[^1];
+
+        _webDriver.FindElement(By.CssSelector(".alert-success a")).Click();
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.Id(ticketId)));
+
+        var ticket = _webDriver.FindElement(By.Id($"{ticketId}"));
+        ticket.FindElement(By.TagName("button")).Click();
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector($"#{ticketId} .tickets")));
+
+        var tickets = ticket.FindElements(By.CssSelector(".tickets .card")).ToList();
+        int totalDistance = tickets.Select(x => x.FindElement(By.ClassName("distance")).Text).Select(int.Parse).Sum();
+        
+        Assert.AreEqual(totalDistance, int.Parse(ticket.FindElement(By.ClassName("travel-distance")).Text));
+    }
+    
+    [TestMethod]
+    [DataRow("Toronto", "New York")]
+    public async Task TestBookingTotalFlightTimeByApi(string origin, string destination)
+    {
+        _webDriver.FindElement(By.CssSelector("a[href='/booking']")).Click();
+
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#origin-city option")));
+
+        _webDriver.FindElement(By.Id("origin-city")).Click();
+        _webDriver.FindElement(By.CssSelector($"#origin-city option[value='{origin}']")).Click();
+
+        _webDriver.FindElement(By.Id("destination-city")).Click();
+        _webDriver.FindElement(By.CssSelector($"#destination-city option[value='{destination}']")).Click();
+
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("tickets")));
+
+        _webDriver.FindElement(By.Id("passengers")).SendKeys("1");
+
+        _webDriver.FindElement(By.CssSelector(".btn-outline-success")).Click();
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".alert-success")));
+
+        string ticketUrl = _webDriver.FindElement(By.CssSelector(".alert-success a")).GetAttribute("href");
+        string ticketId = ticketUrl.Split('#')[^1];
+
+        _webDriver.FindElement(By.CssSelector(".alert-success a")).Click();
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.Id(ticketId)));
+
+        var ticket = _webDriver.FindElement(By.Id($"{ticketId}"));
+        ticket.FindElement(By.TagName("button")).Click();
+        _wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector($"#{ticketId} .tickets")));
+
+        var tickets = ticket.FindElements(By.CssSelector(".tickets .card")).ToList();
+        int totalDistance = tickets.Select(x => x.FindElement(By.ClassName("distance")).Text).Select(int.Parse).Sum();
+        List<int> ticketsIds = tickets.Select(x => x.GetAttribute("id")).Select(int.Parse).ToList();
+        List<int> distancesApi = new();
+        
+        for (int i = 0; i < ticketsIds.Count; i++)
+        {
+            distancesApi.Add(await GetDistanceFromApi(ticketsIds[i]));    
+        }
+        
+        Assert.AreEqual(distancesApi.Sum(), totalDistance);
+    }
+    
+    private async Task<int> GetPriceFromApi(int id, int adults, int children)
+    {
+        var payload = new
+        {
+            id,
+            adults,
+            children
+        };
+
+        var jsonPayload = JsonConvert.SerializeObject(payload);
+        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiUrl}/price")
+        {
+            Content = content
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<int>(responseContent);
+    }
+    
+    private async Task<int> GetDistanceFromApi(int id)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiUrl}/flights/{id}");
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(responseContent);
+        
+        return doc.RootElement.GetProperty("distance").GetInt32();
     }
 }
