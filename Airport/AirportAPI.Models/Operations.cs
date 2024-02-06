@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -51,8 +50,8 @@ public abstract record Operation {
         return operation;
     }
 
-    public static IEnumerable<Operation> FromJson(JsonDocument document) {
-        return document.RootElement.EnumerateArray().Select(FromJson);
+    public static Operation[] FromJson(JsonDocument document) {
+        return document.RootElement.EnumerateArray().Select(FromJson).ToArray();
     }
 
     public OperationInfo GetInfo() {
