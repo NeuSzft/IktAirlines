@@ -42,21 +42,21 @@ namespace AirportApp
             StackPanel mainPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(10) };
 
             StackPanel newItemsPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(5) };
-            newItemsPanel.Children.Add(new TextBlock { Text = "New Items:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+            newItemsPanel.Children.Add(new TextBlock { Text = $"New Items ({updateInfo.AddedItems.Count}):", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
             foreach (var item in updateInfo.AddedItems)
             {
                 newItemsPanel.Children.Add(new TextBlock { Text = $"{item}", Background = Brushes.Green.AdjustAlpha(0.5) });
             }
 
             StackPanel updatedItemsPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(5) };
-            updatedItemsPanel.Children.Add(new TextBlock { Text = "Edited Items:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 5) });
+            updatedItemsPanel.Children.Add(new TextBlock { Text = $"Edited Items ({updateInfo.UpdatedItems.Count}):", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 5) });
             foreach (var item in updateInfo.UpdatedItems)
             {
                 updatedItemsPanel.Children.Add(new TextBlock { Text = $"{item}", Background = Brushes.Yellow.AdjustAlpha(0.5) });
             }
 
             StackPanel removedItemsPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(5) };
-            removedItemsPanel.Children.Add(new TextBlock { Text = "Removed Items:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 5) });
+            removedItemsPanel.Children.Add(new TextBlock { Text = $"Removed Items({updateInfo.RemovedItems.Count}):", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 5) });
             foreach (var item in updateInfo.RemovedItems)
             {
                 removedItemsPanel.Children.Add(new TextBlock { Text = $"{item}", Background = Brushes.Red.AdjustAlpha(0.5) });
