@@ -1,5 +1,6 @@
 using AirportAPI.Models;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,7 +9,7 @@ using System.Windows.Shell;
 
 namespace AirportApp;
 
-internal class Wnd : Window {
+internal sealed class Wnd : Window {
     public Wnd() {
         RequestHelper helper = new("http://localhost:5000");
 
@@ -70,8 +71,18 @@ internal class Wnd : Window {
             destinationIdColumn.ItemsSource = citiesTab.Grid.ItemIds;
         };
 
-        TabControl content = new() { Margin = new(0, 8, 0, 0) };
-        content.Items.Add(new HomeTab(helper, airlinesTab.FillDataGrids, citiesTab.FillDataGrids, flightsTab.FillDataGrids));
+        HomeTab homeTab = new(helper, airlinesTab.FillDataGrids, citiesTab.FillDataGrids, flightsTab.FillDataGrids);
+
+        TabControl content = new();
+        content.SelectionChanged += (_, _) => {
+            foreach (Border border in content.Items.OfType<TabItem>().Select(x => x.Header).OfType<Border>()) {
+                bool selected = border.Equals((content.SelectedItem as TabItem)?.Header);
+                border.Background = selected ? Brushes.LightSkyBlue : Brushes.White;
+                border.BorderBrush = selected ? Brushes.LightSkyBlue : Brushes.LightGray;
+            }
+        };
+
+        content.Items.Add(homeTab);
         content.Items.Add(airlinesTab);
         content.Items.Add(citiesTab);
         content.Items.Add(flightsTab);
@@ -80,7 +91,7 @@ internal class Wnd : Window {
         MinWidth = 500;
         MinHeight = 300;
         Content = content;
-        Title = "Airport Database Manager";
+        Title = "Airlines Database Manager";
 
         Closed += (_, _) => helper.Dispose();
 
@@ -98,10 +109,4 @@ internal class Wnd : Window {
 internal static class Program {
     [STAThread]
     private static void Main() => new Application().Run(new Wnd());
-
-    internal static SolidColorBrush AdjustAlpha(this SolidColorBrush brush, double multiplier) {
-        Color color = brush.Color;
-        color.A = (byte)(color.A * multiplier);
-        return new(color);
-    }
 }
