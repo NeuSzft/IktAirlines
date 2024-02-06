@@ -22,7 +22,8 @@ CREATE TABLE flights (
 INSERT INTO airlines(name) VALUES
 ('airline-1'),
 ('airline-2'),
-('airline-3');
+('airline-3'),
+('airline-4');
 
 INSERT INTO cities(name, population) VALUES
 ('city-1', 1000),
@@ -30,9 +31,11 @@ INSERT INTO cities(name, population) VALUES
 ('city-3', 3000),
 ('city-4', 4000),
 ('city-5', 5000),
-('city-6', 6000);
+('city-6', 6000),
+('city-7', 7000),
+('city-8', 8000);
 
 INSERT INTO flights(airline_id, origin_id, destination_id, distance, flight_time, huf_per_km) VALUES
 (1, 1, 2, 300, 30, 3),
-(2, 3, 4, 500, 50, 5),
-(3, 5, 6, 700, 70, 7);
+(2, 3, 4, 600, 60, 6),
+(3, 5, 6, 900, 90, 9);
