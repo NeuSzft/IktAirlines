@@ -12,7 +12,7 @@
                     <p class="card-text">Children: </p>
                 </div>
                 <div class="col text-end fw-bold">
-                    <p class="card-text distance">{{ flight.distance }} km</p>
+                    <p class="card-text"><span class="distance">{{ flight.distance }}</span> km</p>
                     <p class="card-text price-per-km">{{ flight.huf_per_km }} HUF</p>
                     <p class="card-text">{{ adults + children }}</p>
                     <p class="card-text adults-count">{{ adults }}</p>
