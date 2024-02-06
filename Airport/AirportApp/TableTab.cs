@@ -102,6 +102,8 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
             Grid.Changes.RemovedItems.Select(item => item.ToString()).ToList()!
         );
 
+        if (_updateWindow != null && _updateWindow.IsLoaded) _updateWindow.Close();
+
         _updateWindow = new(updateInfo) { Owner = Window.GetWindow(this) };
         _updateWindow.Show();
     }
