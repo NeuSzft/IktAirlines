@@ -1,12 +1,15 @@
 ﻿using AirportAPI.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace AirportApp;
+
+internal sealed record RequestResult(HttpStatusCode Status, string Message);
 
 internal sealed class RequestHelper(string baseAddress) : IDisposable {
     public Uri BaseAddress => _client.BaseAddress!;
@@ -67,15 +70,15 @@ internal sealed class RequestHelper(string baseAddress) : IDisposable {
         }
     }
 
-    public async Task<string> Modify(IEnumerable<OperationInfo> operations) {
+    public async Task<RequestResult> Modify(IEnumerable<OperationInfo> operations) {
         try {
             HttpResponseMessage response = await _client.PatchAsJsonAsync("/modify", operations);
             string content = await response.Content.ReadAsStringAsync();
-            string result = response.IsSuccessStatusCode ? $"Successfully performed {int.Parse(content)} operations" : $"\n{content}";
-            return $"{response.StatusCode} ({(int)response.StatusCode}) {result}";
+            string result = response.IsSuccessStatusCode ? $"Successfully performed {int.Parse(content)} operation(s)" : content;
+            return new(response.StatusCode, result);
         } catch (Exception e) {
-            ShowRequestError("DELETE", "/modify", e);
-            return e.Message;
+            ShowRequestError("PATCH", "/modify", e);
+            return new(HttpStatusCode.InternalServerError, e.Message);
         }
     }
 

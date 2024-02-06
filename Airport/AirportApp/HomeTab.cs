@@ -39,9 +39,15 @@ internal sealed class HomeTab : TabItem {
         };
         content.Children.Add(border);
 
-        Margin = new(4, 0, 0, 0);
-        Header = new TextBlock { Text = "Home", Width = 64, Height = 16, TextAlignment = TextAlignment.Center };
         Content = content;
+        Template = new() {
+            VisualTree = Utilities.CreateCustomTabItemFactory("Home", (sender, _) => {
+                Border border = (Border)sender;
+                Header = border;
+                border.Background = Brushes.LightSkyBlue;
+                border.BorderBrush = Brushes.LightSkyBlue;
+            })
+        };
 
         SetAddressColor(Brushes.LightGray);
     }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,7 +17,7 @@ internal sealed class Functions<T> {
     public Func<int, T, Task<bool>>? Put { get; set; }
     public Func<int, Task<bool>>? Delete { get; set; }
     public Func<Task<int?>>? NextId { get; set; }
-    public Func<IEnumerable<OperationInfo>, Task<string>>? Modify { get; set; }
+    public Func<IEnumerable<OperationInfo>, Task<RequestResult>>? Modify { get; set; }
 }
 
 internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
@@ -68,8 +68,10 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
         Grid.ItemList.CollectionChanged += (_, _) => SetItemCount();
 
         Functions = functions;
-        Header = new TextBlock { Text = header, Width = 64, Height = 16, TextAlignment = TextAlignment.Center };
         Content = _content;
+        Template = new() {
+            VisualTree = Utilities.CreateCustomTabItemFactory(header, (sender, _) => Header = sender)
+        };
 
         CreateDataGridColumns(columns);
     }
@@ -118,13 +120,15 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
 
         if (Functions.Modify is null)
             return;
-        string result = await Functions.Modify(operations.Select(x => x.GetInfo()));
-        result = Regex.Unescape(result);
+        var result = await Functions.Modify(operations.Select(x => x.GetInfo()));
+        string message = Regex.Unescape(result.Message);
 
-        _updateResult.Text = result.Split('\n', '\r').FirstOrDefault() ?? result;
-        await FillDataGrids();
+        _updateResult.Text = message.Split('\n', '\r').FirstOrDefault() ?? message;
 
-        MessageBox.Show(result);
+        if (result.Status == HttpStatusCode.OK)
+            await FillDataGrids();
+        else
+            MessageBox.Show($"{(int)result.Status}: {result.Status}\n\n{message}", "Failed to update database", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     private async Task<bool> FetchRemoteItems() {
