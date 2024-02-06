@@ -114,7 +114,7 @@ public static class Other {
                 return Results.BadRequest("Invalid JSON data.");
             }
         })
-        .WithName("Calculate the price of a ticket")
+        .WithDescription("Calculate the price of a ticket.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Accepts<Ticket>("application/json")
@@ -122,7 +122,7 @@ public static class Other {
         .Produces(StatusCodes.Status400BadRequest);
 
         app.MapGet("/ping", () => Results.Ok())
-        .WithName("Check if API is available")
+        .WithDescription("A quick way to check if the API is available.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK);
@@ -132,7 +132,7 @@ public static class Other {
             int? id = connection.GetNextId("airlines");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
         })
-        .WithName("Get next available Airline Id")
+        .WithDescription("Get the next available id for an airline.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Produces<int>(StatusCodes.Status200OK, "text/plain")
@@ -143,7 +143,7 @@ public static class Other {
             int? id = connection.GetNextId("cities");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
         })
-        .WithName("Get next available City Id")
+        .WithDescription("Get the next available id for a city.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Produces<int>(StatusCodes.Status200OK, "text/plain")
@@ -154,7 +154,7 @@ public static class Other {
             int? id = connection.GetNextId("flights");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
         })
-        .WithName("Get next available Flight Id")
+        .WithDescription("Get the next available id for a flight.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Produces<int>(StatusCodes.Status200OK, "text/plain")
@@ -182,7 +182,7 @@ public static class Other {
             transaction.Rollback();
             return exception is UnknownOperationException ? Results.UnprocessableEntity(exception.Message) : Results.BadRequest(exception.Message);
         })
-        .WithName("Perform a transaction then roll back on error")
+        .WithDescription("Perform all operations within a single transaction.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Accepts<IEnumerable<OperationInfo>>("application/json")
@@ -212,7 +212,7 @@ public static class Other {
 
             return exception is UnknownOperationException ? Results.UnprocessableEntity(exception.Message) : Results.BadRequest(exception.Message);
         })
-        .WithName("Perform a transaction then roll back")
+        .WithDescription("Perform all operations within a single transaction then rollback. The number of rows affected and the airlines, cities and flights tables are returned in their pre-rollback state.")
         .WithTags("Other Endpoints")
         .WithOpenApi()
         .Accepts<IEnumerable<OperationInfo>>("application/json")

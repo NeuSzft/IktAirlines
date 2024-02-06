@@ -62,17 +62,17 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return Results.Ok(connection.GetCities());
         })
-       .WithName("Get Cities")
-       .WithTags("Cities Endpoints")
-       .WithOpenApi()
-       .Produces<IEnumerable<Models.City>>(StatusCodes.Status200OK, "application/json");
+        .WithDescription("Get all cities.")
+        .WithTags("Cities Endpoints")
+        .WithOpenApi()
+        .Produces<IEnumerable<Models.City>>(StatusCodes.Status200OK, "application/json");
 
         app.MapGet("/cities/{id}", (int id, DatabaseConnection db) => {
             using NpgsqlConnection connection = db.Open();
             var item = connection.GetCity(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
-        .WithName("Get City")
+        .WithDescription("Get a city by id.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces<Models.City?>(StatusCodes.Status200OK, "application/json")
@@ -82,7 +82,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return connection.PostCity(city) > 0 ? Results.Created() : Results.BadRequest();
         })
-        .WithName("Post City")
+        .WithDescription("Add a new city.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status201Created)
@@ -92,7 +92,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return connection.PutCity(id, city) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithName("Put City")
+        .WithDescription("Overwrite an existing city.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
@@ -103,7 +103,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return connection.DelCity(id) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithName("Del City")
+        .WithDescription("Delete an existing city.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)

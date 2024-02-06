@@ -122,7 +122,7 @@ public static class Flights {
             using NpgsqlConnection connection = db.Open();
             return Results.Ok(connection.GetFlights());
         })
-        .WithName("Get Flights")
+        .WithDescription("Get all flights.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json");
@@ -131,7 +131,7 @@ public static class Flights {
             using NpgsqlConnection connection = db.Open();
             return Results.Ok(connection.GetFlightsJoined());
         })
-        .WithName("Get Flights Joined")
+        .WithDescription("Get all flights with the corresponding airline and city information joined to them.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json");
@@ -141,7 +141,7 @@ public static class Flights {
             var item = connection.GetFlight(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
-        .WithName("Get Flight")
+        .WithDescription("Get a flight by id.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Flight>>(StatusCodes.Status200OK, "application/json")
@@ -152,7 +152,7 @@ public static class Flights {
             var item = connection.GetFlightJoined(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
-        .WithName("Get Flight Joined")
+        .WithDescription("Get a flight by id with the corresponding airline and city information joined to them.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.FlightJoined>>(StatusCodes.Status200OK, "application/json")
@@ -162,7 +162,7 @@ public static class Flights {
             using NpgsqlConnection connection = db.Open();
             return connection.PostFlight(flight) > 0 ? Results.Created() : Results.BadRequest();
         })
-        .WithName("Post Flight")
+        .WithDescription("Add a new flight.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status201Created)
@@ -172,7 +172,7 @@ public static class Flights {
             using NpgsqlConnection connection = db.Open();
             return connection.PutFlight(id, flight) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithName("Put Flight")
+        .WithDescription("Overwrite an existing fligth.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
@@ -183,7 +183,7 @@ public static class Flights {
             using NpgsqlConnection connection = db.Open();
             return connection.DelFlight(id) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithName("Del Flight")
+        .WithDescription("Delete an existing flight.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
