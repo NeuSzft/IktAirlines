@@ -33,7 +33,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     private GlyphButton _fetchButton = new(0xE72C, Brushes.RoyalBlue, 28) { Margin = new(2), ToolTip = "Fetch" };
 
     private GroupBox GridBox = new();
-
+    private UpdateWindow _updateWindow = null!;
     public CustomGrid<T> Grid { get; } = new() { MinRowHeight = 22, AutoGenerateColumns = false, CanUserResizeRows = false };
 
     public Functions<T> Functions { get; } = new();
@@ -96,22 +96,13 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     }
 
     private void ShowChanges() {
-        StringBuilder sb = new();
-        sb.AppendLine("New Items:");
-        foreach (T item in Grid.Changes.AddedItems)
-            sb.AppendLine($"  {item}");
+        UpdateInfo updateInfo = new(
+            Grid.Changes.AddedItems.Select(item => item.ToString()).ToList()!,
+            Grid.Changes.UpdatedItems.Select(item => item.ToString()).ToList()!,
+            Grid.Changes.RemovedItems.Select(item => item.ToString()).ToList()!
+        );
 
-        sb.AppendLine();
-        sb.AppendLine("Updated Items:");
-        foreach (T item in Grid.Changes.UpdatedItems)
-            sb.AppendLine($"  {item}");
-
-        sb.AppendLine();
-        sb.AppendLine("Removed Items:");
-        foreach (T item in Grid.Changes.RemovedItems)
-            sb.AppendLine($"  {item}");
-
-        MessageBox.Show(sb.ToString(), $"{(Header as TextBlock)?.Text} Changes");
+        _updateWindow.Show();
     }
 
     private async Task UpdateRemoteItems() {
