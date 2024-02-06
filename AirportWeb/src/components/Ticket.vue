@@ -20,7 +20,14 @@
                 </div>
             </div>
         </div>
-        <p class="card-footer fw-bold mb-0">Price: <span class="ticket-price">{{ price }}</span> HUF</p>
+        <p class="card-footer fw-bold mb-0" v-if="price > 0">Price: <span class="ticket-price">{{ price }}</span> HUF</p>
+        <div class="card-footer mb-0 fw-bold d-flex gap-1 align-items-center" v-else>
+            <p class="mb-1">Price:</p>
+            <div class="spinner-border mx-1" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <p class="mb-1">HUF</p>
+        </div>
     </div>
 </template>
   
@@ -65,15 +72,15 @@ export default {
                 this.price = 0
                 return
             }
-            
+
             http.post('/price', {
                 id: this.flightId,
                 adults: this.adults,
                 children: this.children
             })
-            .then(response => {
-                this.price = response.data
-            })
+                .then(response => {
+                    this.price = response.data
+                })
         }
     }
 }
