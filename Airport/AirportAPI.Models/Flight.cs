@@ -34,5 +34,5 @@ public sealed class Flight : IdModel, IEquatable<Flight> {
             && HufPerKm == other.HufPerKm;
     }
 
-    public override string ToString() => $"{OriginId} - {DestinationId} ({Id})";
+    public override string ToString() => $"from {OriginId} to {DestinationId} ({Id})";
 }

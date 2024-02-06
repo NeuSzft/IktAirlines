@@ -53,7 +53,7 @@ public static class Flights {
         const string query = """
             SELECT
                 id                  AS "Id",
-        	    airline_id          AS "Airline",
+        	    airline_id          AS "AirlineId",
         	    origin_id           AS "OriginId",
         	    destination_id      AS "DestinationId",
         	    flights.flight_time AS "FlightTime",
@@ -172,7 +172,7 @@ public static class Flights {
             using NpgsqlConnection connection = db.Open();
             return connection.PutFlight(id, flight) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithDescription("Overwrite an existing fligth.")
+        .WithDescription("Overwrite an existing flight.")
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)

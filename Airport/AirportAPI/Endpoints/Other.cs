@@ -71,7 +71,7 @@ public static class Other {
         return (null, n);
     }
 
-    public static int? GetNextId(this NpgsqlConnection connection, string table) {
+    public static int? GetCurrentSequenceId(this NpgsqlConnection connection, string table) {
         return connection.QueryFirstOrDefault<int?>($"SELECT last_value FROM {table}_id_seq;");
     }
 
@@ -129,7 +129,7 @@ public static class Other {
 
         app.MapGet("/next-id/airlines", (DatabaseConnection db) => {
             using NpgsqlConnection connection = db.Open();
-            int? id = connection.GetNextId("airlines");
+            int? id = connection.GetCurrentSequenceId("airlines");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
         })
         .WithDescription("Get the next available id for an airline.")
@@ -140,7 +140,7 @@ public static class Other {
 
         app.MapGet("/next-id/cities", (DatabaseConnection db) => {
             using NpgsqlConnection connection = db.Open();
-            int? id = connection.GetNextId("cities");
+            int? id = connection.GetCurrentSequenceId("cities");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
         })
         .WithDescription("Get the next available id for a city.")
@@ -151,7 +151,7 @@ public static class Other {
 
         app.MapGet("/next-id/flights", (DatabaseConnection db) => {
             using NpgsqlConnection connection = db.Open();
-            int? id = connection.GetNextId("flights");
+            int? id = connection.GetCurrentSequenceId("flights");
             return id is null ? Results.NotFound() : Results.Ok(id + 1);
         })
         .WithDescription("Get the next available id for a flight.")
