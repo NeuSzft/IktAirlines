@@ -2,15 +2,13 @@ namespace AirportAPI.Tests;
 
 [TestClass]
 public class PutTests {
-    private const string ApiAddressEnv = "API_ADDRESS";
-
     private HttpClient _client = null!;
 
     [TestInitialize]
-    public void Initialize() => _client = new() { BaseAddress = new($"http://{Environment.GetEnvironmentVariable(ApiAddressEnv) ?? "localhost"}:5000") };
+    public void Initialize() => _client = Utilities.Initialize();
 
     [TestCleanup]
-    public void Cleanup() => _client?.Dispose();
+    public void Cleanup() => Utilities.Cleanup(_client);
 
     [TestMethod]
     [DataRow(1), DataRow(2), DataRow(3)]
