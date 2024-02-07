@@ -1,75 +1,55 @@
 # Airlines Management API
-
 > Version 1.0.0
 
-## Path Table
+## Endpoints Table
 
 | Method | Path | Description |
 | --- | --- | --- |
-| GET | [/airlines](#getairlines) | Get all airlines. |
-| POST | [/airlines](#postairlines) | Add a new airline. |
-| DELETE | [/airlines/{id}](#deleteairlinesid) | Delete an existing airline. |
-| GET | [/airlines/{id}](#getairlinesid) | Get an airline by id. |
-| PUT | [/airlines/{id}](#putairlinesid) | Overwrite an existing airline. |
-| GET | [/cities](#getcities) | Get all cities. |
-| POST | [/cities](#postcities) | Add a new city. |
-| DELETE | [/cities/{id}](#deletecitiesid) | Delete an existing city. |
-| GET | [/cities/{id}](#getcitiesid) | Get a city by id. |
-| PUT | [/cities/{id}](#putcitiesid) | Overwrite an existing city. |
-| GET | [/flights](#getflights) | Get all flights. |
-| POST | [/flights](#postflights) | Add a new flight. |
-| GET | [/flights/joined](#getflightsjoined) | Get all flights with the corresponding airline and city information joined to them. |
-| DELETE | [/flights/{id}](#deleteflightsid) | Delete an existing flight. |
-| GET | [/flights/{id}](#getflightsid) | Get a flight by id. |
-| PUT | [/flights/{id}](#putflightsid) | Overwrite an existing flight. |
-| GET | [/flights/{id}/joined](#getflightsidjoined) | Get a flight by id with the corresponding airline and city information joined to them. |
-| PATCH | [/modify](#patchmodify) | Perform all operations within a single transaction. |
-| PATCH | [/modify/test](#patchmodifytest) | Perform all operations within a single transaction then rollback. |
-| GET | [/next-id/airlines](#getnext-idairlines) | Get the next available id for an airline. |
-| GET | [/next-id/cities](#getnext-idcities) | Get the next available id for a city. |
-| GET | [/next-id/flights](#getnext-idflights) | Get the next available id for a flight. |
-| GET | [/ping](#getping) | A quick way to check if the API is available. |
-| POST | [/price](#postprice) | Calculate the price of a ticket. |
+| POST | [/airlines](#post-airlines) | Add a new airline. |
+| GET | [/airlines](#get-airlines) | Get all airlines. |
+| GET | [/airlines/{id}](#get-airlinesid) | Get an airline by id. |
+| PUT | [/airlines/{id}](#put-airlinesid) | Overwrite an existing airline. |
+| DELETE | [/airlines/{id}](#delete-airlinesid) | Delete an existing airline. |
+|
+| POST | [/cities](#post-cities) | Add a new city. |
+| GET | [/cities](#get-cities) | Get all cities. |
+| GET | [/cities/{id}](#get-citiesid) | Get a city by id. |
+| PUT | [/cities/{id}](#put-citiesid) | Overwrite an existing city. |
+| DELETE | [/cities/{id}](#delete-citiesid) | Delete an existing city. |
+|
+| POST | [/flights](#post-flights) | Add a new flight. |
+| GET | [/flights](#get-flights) | Get all flights. |
+| GET | [/flights/joined](#get-flightsjoined) | Get all flights with the corresponding airline and city information joined to them. |
+| GET | [/flights/{id}](#get-flightsid) | Get a flight by id. |
+| GET | [/flights/{id}/joined](#get-flightsidjoined) | Get a flight by id with the corresponding airline and city information joined to them. |
+| PUT | [/flights/{id}](#put-flightsid) | Overwrite an existing flight. |
+| DELETE | [/flights/{id}](#delete-flightsid) | Delete an existing flight. |
+|
+| POST | [/price](#post-price) | Calculate the price of a ticket. |
+| GET | [/ping](#get-ping) | A quick way to check if the API is available. |
+| GET | [/next-id/airlines](#get-next-idairlines) | Get the next available id for an airline. |
+| GET | [/next-id/cities](#get-next-idcities) | Get the next available id for a city. |
+| GET | [/next-id/flights](#get-next-idflights) | Get the next available id for a flight. |
+| PATCH | [/modify](#patch-modify) | Perform all operations within a single transaction. |
+| PATCH | [/modify/test](#patch-modifytest) | Perform all operations within a single transaction then rollback. |
 
-## Reference Table
+## Schemas Table
 
-| Name | Path | Description |
-| --- | --- | --- |
-| Airline | [#/components/schemas/Airline](#componentsschemasairline) |  |
-| City | [#/components/schemas/City](#componentsschemascity) |  |
-| Flight | [#/components/schemas/Flight](#componentsschemasflight) |  |
-| FlightJoined | [#/components/schemas/FlightJoined](#componentsschemasflightjoined) |  |
-| ModificationResults | [#/components/schemas/ModificationResults](#componentsschemasmodificationresults) |  |
-| OperationInfo | [#/components/schemas/OperationInfo](#componentsschemasoperationinfo) |  |
-| Ticket | [#/components/schemas/Ticket](#componentsschemasticket) |  |
+| Name | Source File |
+| --- | --- |
+| [Airline](#airline-model) | [Airline.cs](AirportAPI.Models/Airline.cs) |
+| [City](#city-model) | [City.cs](AirportAPI.Models/City.cs) |
+| [Flight](#flight-model) | [Flight.cs](AirportAPI.Models/Flight.cs) |
+| [FlightJoined](#flightjoined-model) | [FlightJoined.cs](AirportAPI.Models/FlightJoined.cs) |
+| [ModificationResults](#modificationresults-model) | [ModificationResults.cs](AirportAPI.Models/ModificationResults.cs) |
+| [OperationInfo](#operationinfo-model) | [Operations.cs](AirportAPI.Models/Operations.cs) |
+| [Ticket](#ticket-model) | [Ticket.cs](AirportAPI.Models/Ticket.cs) |
 
-### [GET]/airlines
-
-> Get all airlines.
-
-#### Responses
-
-- 200 OK
-
-`application/json`
-
-```ts
-{
-  id?: integer
-  name: string
-}[]
-```
-
-***
-
-### [POST]/airlines
-
+### `POST` /airlines
 > Add a new airline.
 
 #### RequestBody
-
 - application/json
-
 ```ts
 {
   id?: integer
@@ -78,54 +58,47 @@
 ```
 
 #### Responses
-
 - 201 Created
-
 - 400 Bad Request
 
 ***
 
-### [DELETE]/airlines/{id}
-
-> Delete an existing airline.
+### `GET` /airlines
+> Get all airlines.
 
 #### Responses
-
 - 200 OK
-
-- 400 Bad Request
+`application/json`
+```ts
+{
+  id?: integer
+  name: string
+}[]
+```
 
 ***
 
-### [GET]/airlines/{id}
-
+### `GET` /airlines/{id}
 > Get an airline by id.
 
 #### Responses
-
 - 200 OK
-
 `application/json`
-
 ```ts
 {
   id?: integer
   name: string
 }
 ```
-
 - 404 Not Found
 
 ***
 
-### [PUT]/airlines/{id}
-
+### `PUT` /airlines/{id}
 > Overwrite an existing airline.
 
 #### RequestBody
-
-- application/json
-
+`application/json`
 ```ts
 {
   id?: integer
@@ -134,43 +107,26 @@
 ```
 
 #### Responses
-
 - 200 OK
-
 - 400 Bad Request
-
 - 404 Not Found
 
 ***
 
-### [GET]/cities
-
-> Get all cities.
+### `DELETE` /airlines/{id}
+> Delete an existing airline.
 
 #### Responses
-
 - 200 OK
-
-`application/json`
-
-```ts
-{
-  id?: integer
-  name: string
-  population: integer
-}[]
-```
+- 400 Bad Request
 
 ***
 
-### [POST]/cities
-
+### `POST` /cities
 > Add a new city.
 
 #### RequestBody
-
-- application/json
-
+`application/json`
 ```ts
 {
   id?: integer
@@ -180,35 +136,33 @@
 ```
 
 #### Responses
-
 - 201 Created
-
 - 400 Bad Request
 
 ***
 
-### [DELETE]/cities/{id}
-
-> Delete an existing city.
+### `GET` /cities
+> Get all cities.
 
 #### Responses
-
 - 200 OK
-
-- 400 Bad Request
+`application/json`
+```ts
+{
+  id?: integer
+  name: string
+  population: integer
+}[]
+```
 
 ***
 
-### [GET]/cities/{id}
-
+### `GET` /cities/{id}
 > Get a city by id.
 
 #### Responses
-
 - 200 OK
-
 `application/json`
-
 ```ts
 {
   id?: integer
@@ -216,19 +170,15 @@
   population: integer
 }
 ```
-
 - 404 Not Found
 
 ***
 
-### [PUT]/cities/{id}
-
+### `PUT` /cities/{id}
 > Overwrite an existing city.
 
 #### RequestBody
-
-- application/json
-
+`application/json`
 ```ts
 {
   id?: integer
@@ -238,47 +188,26 @@
 ```
 
 #### Responses
-
 - 200 OK
-
 - 400 Bad Request
-
 - 404 Not Found
 
 ***
 
-### [GET]/flights
-
-> Get all flights.
+### `DELETE` /cities/{id}
+> Delete an existing city.
 
 #### Responses
-
 - 200 OK
-
-`application/json`
-
-```ts
-{
-  id?: integer
-  airline_id: integer
-  origin_id: integer
-  destination_id: integer
-  distance: integer
-  flight_time: integer
-  huf_per_km: integer
-}[]
-```
+- 400 Bad Request
 
 ***
 
-### [POST]/flights
-
+### `POST` /flights
 > Add a new flight.
 
 #### RequestBody
-
-- application/json
-
+`application/json`
 ```ts
 {
   id?: integer
@@ -292,23 +221,37 @@
 ```
 
 #### Responses
-
 - 201 Created
-
 - 400 Bad Request
 
 ***
 
-### [GET]/flights/joined
+### `GET` /flights
+> Get all flights.
 
+#### Responses
+- 200 OK
+`application/json`
+```ts
+{
+  id?: integer
+  airline_id: integer
+  origin_id: integer
+  destination_id: integer
+  distance: integer
+  flight_time: integer
+  huf_per_km: integer
+}[]
+```
+
+***
+
+### `GET` /flights/joined
 > Get all flights with the corresponding airline and city information joined to them.
 
 #### Responses
-
 - 200 OK
-
 `application/json`
-
 ```ts
 {
   id?: integer
@@ -325,28 +268,12 @@
 
 ***
 
-### [DELETE]/flights/{id}
-
-> Delete an existing flight.
-
-#### Responses
-
-- 200 OK
-
-- 400 Bad Request
-
-***
-
-### [GET]/flights/{id}
-
+### `GET` /flights/{id}
 > Get a flight by id.
 
 #### Responses
-
 - 200 OK
-
 `application/json`
-
 ```ts
 {
   id?: integer
@@ -358,51 +285,16 @@
   huf_per_km: integer
 }[]
 ```
-
 - 404 Not Found
 
 ***
 
-### [PUT]/flights/{id}
-
-> Overwrite an existing flight.
-
-#### RequestBody
-
-- application/json
-
-```ts
-{
-  id?: integer
-  airline_id: integer
-  origin_id: integer
-  destination_id: integer
-  distance: integer
-  flight_time: integer
-  huf_per_km: integer
-}
-```
-
-#### Responses
-
-- 200 OK
-
-- 400 Bad Request
-
-- 404 Not Found
-
-***
-
-### [GET]/flights/{id}/joined
-
+### `GET` /flights/{id}/joined
 > Get a flight by id with the corresponding airline and city information joined to them.
 
 #### Responses
-
 - 200 OK
-
 `application/json`
-
 ```ts
 {
   id?: integer
@@ -416,196 +308,48 @@
   huf_per_km: integer
 }[]
 ```
-
 - 404 Not Found
 
 ***
 
-### [PATCH]/modify
-
-> Perform all operations within a single transaction.
-
-#### RequestBody
-
-- application/json
-
-```ts
-{
-  operation_name: string
-  model_name: string
-  id?: integer
-}[]
-```
-
-#### Responses
-
-- 200 OK
-
-`text/plain`
-
-```ts
-{
-  "type": "integer",
-  "format": "int32"
-}
-```
-
-- 400 Bad Request
-
-- 422 Unprocessable Entity
-
-`text/plain`
-
-```ts
-{
-  "type": "string"
-}
-```
-
-***
-
-### [PATCH]/modify/test
-
-> Perform all operations within a single transaction then rollback.
-> Returns the number of rows affected and the airlines, cities and flights tables in their pre-rollback state.
+### `PUT` /flights/{id}
+> Overwrite an existing flight.
 
 #### RequestBody
-
-- application/json
-
-```ts
-{
-  operation_name: string
-  model_name: string
-  id?: integer
-}[]
-```
-
-#### Responses
-
-- 200 OK
-
 `application/json`
-
 ```ts
 {
-  rows_affected: integer
-  airlines: {
-    id?: integer
-    name: string
-  }[]
-  cities: {
-    id?: integer
-    name: string
-    population: integer
-  }[]
-  flights: {
-    id?: integer
-    airline_id: integer
-    origin_id: integer
-    destination_id: integer
-    distance: integer
-    flight_time: integer
-    huf_per_km: integer
-  }[]
+  id?: integer
+  airline_id: integer
+  origin_id: integer
+  destination_id: integer
+  distance: integer
+  flight_time: integer
+  huf_per_km: integer
 }
 ```
 
+#### Responses
+- 200 OK
+- 400 Bad Request
+- 404 Not Found
+
+***
+
+### `DELETE` /flights/{id}
+> Delete an existing flight.
+
+#### Responses
+- 200 OK
 - 400 Bad Request
 
-- 422 Unprocessable Entity
-
-`text/plain`
-
-```ts
-{
-  "type": "string"
-}
-```
-
 ***
 
-### [GET]/next-id/airlines
-
-> Get the next available id for an airline.
-
-#### Responses
-
-- 200 OK
-
-`text/plain`
-
-```ts
-{
-  "type": "integer",
-  "format": "int32"
-}
-```
-
-- 404 Not Found
-
-***
-
-### [GET]/next-id/cities
-
-> Get the next available id for a city.
-
-#### Responses
-
-- 200 OK
-
-`text/plain`
-
-```ts
-{
-  "type": "integer",
-  "format": "int32"
-}
-```
-
-- 404 Not Found
-
-***
-
-### [GET]/next-id/flights
-
-> Get the next available id for a flight.
-
-#### Responses
-
-- 200 OK
-
-`text/plain`
-
-```ts
-{
-  "type": "integer",
-  "format": "int32"
-}
-```
-
-- 404 Not Found
-
-***
-
-### [GET]/ping
-
-> A quick way to check if the API is available.
-
-#### Responses
-
-- 200 OK
-
-***
-
-### [POST]/price
-
+### `POST` /price
 > Calculate the price of a ticket.
 
 #### RequestBody
-
 - application/json
-
 ```ts
 {
   id?: integer
@@ -615,23 +359,141 @@
 ```
 
 #### Responses
+- 200 OK
+`text/plain`
+```
+int32 as string
+```
+- 400 Bad Request
 
+***
+
+### `GET` /ping
+> A quick way to check if the API is available.
+
+#### Responses
 - 200 OK
 
-`application/json`
+***
+
+### `GET` /next-id/airlines
+> Get the next available id for an airline.
+
+#### Responses
+- 200 OK
+`text/plain`
+```
+int32 as string
+```
+- 404 Not Found
+
+***
+
+### `GET` /next-id/cities
+> Get the next available id for a city.
+
+#### Responses
+- 200 OK
+`text/plain`
+```
+int32 as string
+```
+- 404 Not Found
+
+***
+
+### `GET` /next-id/flights
+> Get the next available id for a flight.
+
+#### Responses
+- 200 OK
+`text/plain`
+```
+int32 as string
+```
+- 404 Not Found
+
+***
+
+### [PATCH]/modify
+> Perform all operations within a single transaction.
+
+#### RequestBody
+- application/json
 
 ```ts
 {
-  "type": "integer",
-  "format": "int32"
-}
+  operation_name: string
+  model_name: string
+  id?: integer
+}[]
 ```
 
+#### Responses
+- 200 OK
+`text/plain`
+```
+string
+```
 - 400 Bad Request
+- 422 Unprocessable Entity
+`text/plain`
+```
+string
+```
 
-## References
+***
 
-### #/components/schemas/Airline
+### [PATCH]/modify/test
+> Perform all operations within a single transaction then rollback.
+> Returns the number of rows affected and the airlines, cities and flights tables in their pre-rollback state.
+
+#### RequestBody
+- application/json
+```ts
+{
+  operation_name: string
+  model_name: string
+  id?: integer
+}[]
+```
+
+#### Responses
+- 200 OK
+`application/json`
+```ts
+{
+  rows_affected: integer
+  airlines: {
+    id?: integer
+    name: string
+  }[]
+  cities: {
+    id?: integer
+    name: string
+    population: integer
+  }[]
+  flights: {
+    id?: integer
+    airline_id: integer
+    origin_id: integer
+    destination_id: integer
+    distance: integer
+    flight_time: integer
+    huf_per_km: integer
+  }[]
+}
+```
+- 400 Bad Request
+- 422 Unprocessable Entity
+`text/plain`
+```
+string
+```
+
+## Schemas
+
+### Airline Model
 
 ```ts
 {
@@ -640,7 +502,7 @@
 }
 ```
 
-### #/components/schemas/City
+### City Model
 
 ```ts
 {
@@ -650,7 +512,7 @@
 }
 ```
 
-### #/components/schemas/Flight
+### Flight Model
 
 ```ts
 {
@@ -664,7 +526,7 @@
 }
 ```
 
-### #/components/schemas/FlightJoined
+### FlightJoined Model
 
 ```ts
 {
@@ -680,7 +542,7 @@
 }
 ```
 
-### #/components/schemas/ModificationResults
+### ModificationResults Model
 
 ```ts
 {
@@ -706,7 +568,7 @@
 }
 ```
 
-### #/components/schemas/OperationInfo
+### OperationInfo Model
 
 ```ts
 {
@@ -717,7 +579,7 @@
 }
 ```
 
-### #/components/schemas/Ticket
+### Ticket Model
 
 ```ts
 {
