@@ -14,6 +14,10 @@ namespace AirportApp;
 internal sealed record RequestResult(HttpStatusCode Status, string Message);
 
 internal sealed class RequestHelper(string baseAddress) : IDisposable {
+    public class ResponseException(string message) : Exception {
+        public override string Message => message;
+    }
+
     public Uri BaseAddress => _client.BaseAddress!;
 
     private HttpClient _client = new() { BaseAddress = new(baseAddress) };
@@ -21,7 +25,7 @@ internal sealed class RequestHelper(string baseAddress) : IDisposable {
     public async Task<IEnumerable<T>?> Get<T>(string path) {
         HttpResponseMessage response = await _client.GetAsync(path);
         if (!response.IsSuccessStatusCode)
-            throw new Exception(await response.Content.ReadAsStringAsync());
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
         using Stream stream = await response.Content.ReadAsStreamAsync();
         return JsonSerializer.Deserialize<IEnumerable<T>>(stream);
     }
@@ -29,26 +33,26 @@ internal sealed class RequestHelper(string baseAddress) : IDisposable {
     public async Task Post<T>(string path, T obj) {
         HttpResponseMessage response = await _client.PostAsJsonAsync(path, obj);
         if (!response.IsSuccessStatusCode)
-            throw new Exception(await response.Content.ReadAsStringAsync());
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
     }
 
     public async Task Put<T>(string path, T obj) {
         HttpResponseMessage response = await _client.PutAsJsonAsync(path, obj);
         if (!response.IsSuccessStatusCode)
-            throw new Exception(await response.Content.ReadAsStringAsync());
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
     }
 
     public async Task Delete(string path) {
         HttpResponseMessage response = await _client.DeleteAsync(path);
         if (!response.IsSuccessStatusCode)
-            throw new Exception(await response.Content.ReadAsStringAsync());
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
     }
 
     public async Task<int> NextId(string path) {
         HttpResponseMessage response = await _client.GetAsync(path);
         string content = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
-            throw new Exception(content);
+            throw new ResponseException(content);
         return int.Parse(content);
     }
 
