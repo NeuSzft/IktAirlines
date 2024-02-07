@@ -415,7 +415,7 @@ int32 as string
 
 ***
 
-### [PATCH]/modify
+### `PATCH` /modify
 > Perform all operations within a single transaction.
 
 #### RequestBody
@@ -444,7 +444,7 @@ string
 
 ***
 
-### [PATCH]/modify/test
+### `PATCH` /modify/test
 > Perform all operations within a single transaction then rollback.
 > Returns the number of rows affected and the airlines, cities and flights tables in their pre-rollback state.
 
