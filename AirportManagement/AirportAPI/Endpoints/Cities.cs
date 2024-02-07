@@ -62,7 +62,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return Results.Ok(connection.GetCities());
         })
-        .WithDescription("Get all cities.")
+        .WithSummary("Get all cities.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.City>>(StatusCodes.Status200OK, "application/json");
@@ -72,7 +72,7 @@ public static class Cities {
             var item = connection.GetCity(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
-        .WithDescription("Get a city by id.")
+        .WithSummary("Get a city by id.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces<Models.City?>(StatusCodes.Status200OK, "application/json")
@@ -82,7 +82,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return connection.PostCity(city) > 0 ? Results.Created() : Results.BadRequest();
         })
-        .WithDescription("Add a new city.")
+        .WithSummary("Add a new city.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status201Created)
@@ -92,7 +92,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return connection.PutCity(id, city) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithDescription("Overwrite an existing city.")
+        .WithSummary("Overwrite an existing city.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
@@ -103,7 +103,7 @@ public static class Cities {
             using NpgsqlConnection connection = db.Open();
             return connection.DelCity(id) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithDescription("Delete an existing city.")
+        .WithSummary("Delete an existing city.")
         .WithTags("Cities Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
