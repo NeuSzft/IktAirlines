@@ -161,7 +161,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
 
         foreach (T failed in failedUpdatedItems) {
             foreach (T item in Grid.ItemList.Where(x => x.Id == failed.Id)) {
-                Utilities.CopyTo(failed, item);
+                failed.CopyTo(item);
                 Grid.Changes.UpdatedItems.Add(item);
             }
         }
