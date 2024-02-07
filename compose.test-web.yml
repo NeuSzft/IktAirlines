@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db-selenium:
     container_name: airport-db-selenium
-    image: postgres:latest
+    image: postgres:15
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
       - db-data-selenium:/var/lib/postgresql/data

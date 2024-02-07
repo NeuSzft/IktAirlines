@@ -1,7 +1,7 @@
 services:
   test-db:
     container_name: airport-test-db
-    image: postgres:latest
+    image: postgres:15
     volumes:
       - ./initdb-test.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
     networks:
@@ -49,6 +49,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
+        RUN apt update
+        RUN apt install postgresql-client-15 -y
         COPY ./AirportManagement/AirportAPI.Tests /app/AirportAPI.Tests
         COPY ./AirportManagement/AirportAPI.Models /app/AirportAPI.Models
         WORKDIR /app/AirportAPI.Tests
@@ -62,6 +64,10 @@ services:
       - test-net
     environment:
       API_ADDRESS: test-api
+      DB_HOST: test-db
+      DB_NAME: airport
+      DB_USER: postgres
+      PGPASSWORD: postgres
 
 volumes:
   test-api-app:

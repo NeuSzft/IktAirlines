@@ -43,6 +43,8 @@ Local ports used by the services:
 
 The tests can be run using [docker compose](https://github.com/docker/compose) and the appropriate compose file.
 
-To run the API tests run the `docker compose -f compose.test-api.yml up` command the [compose.test-api.yml](./compose.test-api.yml) file or run [test-api.sh](./test-api.sh) script.
+To run the API tests run the `docker compose -f compose.test-api.yml up` command or the [test-api.sh](./test-api.sh) script.
 
-To run the web interface's [Selenium](https://www.selenium.dev/) tests use the [compose.test-web.yml](./compose.test-web.yml) file or run [test-web.sh](./test-web.sh) script.
+The last test results for the API can be found [here](./AirportManagement/api-test-results.md).
+
+To run the Selenium tests of the web interface run the `docker compose -f compose.test-api.yml up` command.
