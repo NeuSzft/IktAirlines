@@ -71,8 +71,39 @@ public class PutTests {
     }
 
     [TestMethod]
-    [DataRow("/airlines/300"), DataRow("/cities/300"), DataRow("/flights/300")]
-    public async Task PutNonExistentId(string path) {
+    [DataRow(100), DataRow(200), DataRow(300)]
+    public async Task PutAirlineWithNonExistentId(int id) {
+        Airline airline = new() { Name = $"airline-{id}" };
+        var response = await _client.PutAsJsonAsync($"/airlines/{id}", airline);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [TestMethod]
+    [DataRow(100), DataRow(200), DataRow(300)]
+    public async Task PutCityWithNonExistentId(int id) {
+        City city = new() { Name = $"city-{id}", Population = id * 2000 };
+        var response = await _client.PutAsJsonAsync($"/cities/{id}", city);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [TestMethod]
+    [DataRow(100), DataRow(200), DataRow(300)]
+    public async Task PutFlightWithNonExistentId(int id) {
+        Flight flight = new() {
+            AirlineId = id,
+            OriginId = id * 2 - 1,
+            DestinationId = id * 2,
+            Distance = id * 400,
+            FlightTime = id * 50,
+            HufPerKm = id * 6
+        };
+        var response = await _client.PutAsJsonAsync($"/flights/{id}", flight);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [TestMethod]
+    [DataRow("/airlines/1"), DataRow("/cities/2"), DataRow("/flights/3")]
+    public async Task PutNullItems(string path) {
         var response = await _client.PutAsync(path, null);
         Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
     }

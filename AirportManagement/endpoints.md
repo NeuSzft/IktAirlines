@@ -362,7 +362,7 @@
 - 200 OK
 `text/plain`
 ```
-int32 as string
+int32 number as a plain text string
 ```
 - 400 Bad Request
 
@@ -383,7 +383,7 @@ int32 as string
 - 200 OK
 `text/plain`
 ```
-int32 as string
+int32 number as a plain text string
 ```
 - 404 Not Found
 
@@ -396,7 +396,7 @@ int32 as string
 - 200 OK
 `text/plain`
 ```
-int32 as string
+int32 number as a plain text string
 ```
 - 404 Not Found
 
@@ -409,7 +409,7 @@ int32 as string
 - 200 OK
 `text/plain`
 ```
-int32 as string
+int32 number as a plain text string
 ```
 - 404 Not Found
 
@@ -433,13 +433,13 @@ int32 as string
 - 200 OK
 `text/plain`
 ```
-string
+plain text error message
 ```
 - 400 Bad Request
 - 422 Unprocessable Entity
 `text/plain`
 ```
-string
+plain text error message
 ```
 
 ***
@@ -488,7 +488,7 @@ string
 - 422 Unprocessable Entity
 `text/plain`
 ```
-string
+plain text error message
 ```
 
 ## Schemas
