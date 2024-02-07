@@ -187,7 +187,7 @@ public static class Other {
         .WithOpenApi()
         .Accepts<IEnumerable<OperationInfo>>("application/json")
         .Produces<int>(StatusCodes.Status200OK, "text/plain")
-        .Produces(StatusCodes.Status400BadRequest)
+        .Produces<string>(StatusCodes.Status400BadRequest, "text/plain")
         .Produces<string>(StatusCodes.Status422UnprocessableEntity, "text/plain");
 
         app.MapPatch("/modify/test", async (DatabaseConnection db, HttpRequest request) => {
@@ -218,7 +218,7 @@ public static class Other {
         .WithOpenApi()
         .Accepts<IEnumerable<OperationInfo>>("application/json")
         .Produces<ModificationResults>(StatusCodes.Status200OK, "application/json")
-        .Produces(StatusCodes.Status400BadRequest)
+        .Produces<string>(StatusCodes.Status400BadRequest, "text/plain")
         .Produces<string>(StatusCodes.Status422UnprocessableEntity, "text/plain");
     }
 }
