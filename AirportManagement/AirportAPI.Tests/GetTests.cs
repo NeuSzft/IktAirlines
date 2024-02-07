@@ -106,4 +106,18 @@ public class GetTests {
         Assert.AreEqual(id * 30, flight.FlightTime);
         Assert.AreEqual(id * 3, flight.HufPerKm);
     }
+
+    [TestMethod]
+    [DataRow("/airlines/17"), DataRow("/cities/17"), DataRow("/flights/17"), DataRow("/flights/17/joined")]
+    public async Task GetNonExistentItems(string path) {
+        var response = await _client.GetAsync(path);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [TestMethod]
+    [DataRow("/airline"), DataRow("/city"), DataRow("/flight")]
+    public async Task GetWrongPath(string path) {
+        var response = await _client.GetAsync(path);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
