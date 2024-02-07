@@ -10,13 +10,13 @@
 | GET | [/airlines/{id}](#get-airlinesid) | Get an airline by id. |
 | PUT | [/airlines/{id}](#put-airlinesid) | Overwrite an existing airline. |
 | DELETE | [/airlines/{id}](#delete-airlinesid) | Delete an existing airline. |
-|
+| | |
 | POST | [/cities](#post-cities) | Add a new city. |
 | GET | [/cities](#get-cities) | Get all cities. |
 | GET | [/cities/{id}](#get-citiesid) | Get a city by id. |
 | PUT | [/cities/{id}](#put-citiesid) | Overwrite an existing city. |
 | DELETE | [/cities/{id}](#delete-citiesid) | Delete an existing city. |
-|
+| | |
 | POST | [/flights](#post-flights) | Add a new flight. |
 | GET | [/flights](#get-flights) | Get all flights. |
 | GET | [/flights/joined](#get-flightsjoined) | Get all flights with the corresponding airline and city information joined to them. |
@@ -24,7 +24,7 @@
 | GET | [/flights/{id}/joined](#get-flightsidjoined) | Get a flight by id with the corresponding airline and city information joined to them. |
 | PUT | [/flights/{id}](#put-flightsid) | Overwrite an existing flight. |
 | DELETE | [/flights/{id}](#delete-flightsid) | Delete an existing flight. |
-|
+| | |
 | POST | [/price](#post-price) | Calculate the price of a ticket. |
 | GET | [/ping](#get-ping) | A quick way to check if the API is available. |
 | GET | [/next-id/airlines](#get-next-idairlines) | Get the next available id for an airline. |
