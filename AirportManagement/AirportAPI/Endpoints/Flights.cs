@@ -187,7 +187,6 @@ public static class Flights {
         .WithTags("Flights Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status404NotFound);
+        .Produces(StatusCodes.Status400BadRequest);
     }
 }

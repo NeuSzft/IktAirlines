@@ -52,7 +52,7 @@ services:
         COPY ./AirportManagement/AirportAPI.Tests /app/AirportAPI.Tests
         COPY ./AirportManagement/AirportAPI.Models /app/AirportAPI.Models
         WORKDIR /app/AirportAPI.Tests
-        ENTRYPOINT [ "dotnet", "test", "-l", "trx;LogFileName=/app/results/Api.trx" ]
+        ENTRYPOINT [ "dotnet", "test", "-l", "trx;LogFileName=/app/results/api.trx" ]
     depends_on:
       test-api:
         condition: service_started
