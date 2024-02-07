@@ -72,7 +72,7 @@ internal sealed class ManagementWindow : Window {
 
         HomeTab homeTab = new(helper, airlinesTab.FillDataGrids, citiesTab.FillDataGrids, flightsTab.FillDataGrids);
 
-        TabControl content = new();
+        TabControl content = new() { SelectedItem = homeTab };
         content.SelectionChanged += (_, _) => {
             foreach (Border border in content.Items.OfType<TabItem>().Select(x => x.Header).OfType<Border>()) {
                 bool selected = border.Equals((content.SelectedItem as TabItem)?.Header);

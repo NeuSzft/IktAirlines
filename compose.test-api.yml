@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
-        COPY ./Airport/AirportAPI /build/AirportAPI
-        COPY ./Airport/AirportAPI.Models /build/AirportAPI.Models
+        COPY ./AirportManagement/AirportAPI /build/AirportAPI
+        COPY ./AirportManagement/AirportAPI.Models /build/AirportAPI.Models
         WORKDIR /build/AirportAPI
         ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
     volumes:
@@ -49,8 +49,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
-        COPY ./Airport/AirportAPI.Tests /app/AirportAPI.Tests
-        COPY ./Airport/AirportAPI.Models /app/AirportAPI.Models
+        COPY ./AirportManagement/AirportAPI.Tests /app/AirportAPI.Tests
+        COPY ./AirportManagement/AirportAPI.Models /app/AirportAPI.Models
         WORKDIR /app/AirportAPI.Tests
         ENTRYPOINT [ "dotnet", "test" ]
     depends_on:
