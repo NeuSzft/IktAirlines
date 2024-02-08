@@ -20,7 +20,7 @@ List of available [endpoints](./AirportManagement/endpoints.md).
 
 ## Web Interface
 
->TODO
+[User manual](./AirportWeb/user-manual.md)
 
 ## Desktop Application
 
