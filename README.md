@@ -1,4 +1,4 @@
-# Airlines Project
+# :airplane: Airlines Management Project
 
 ### Table of Contents
 - [Overview](#overview)
@@ -16,7 +16,7 @@ This project contains an API for managing a PostgreSQL database, a web interface
 
 The API is made using [APS.NET Core](https://github.com/dotnet/aspnetcore) and it's [Minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/overview?view=aspnetcore-8.0) approach.
 
-List of available [endpoints](./AirportManagement/endpoints.md).
+List of available [endpoints](./AirportManagement/docs/endpoints.md).
 
 ## Web Interface
 
