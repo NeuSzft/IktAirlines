@@ -5,7 +5,6 @@ services:
     image: postgres:15
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
-      - db-data-selenium:/var/lib/postgresql/data
     networks:
       - net-selenium
     environment:
@@ -117,8 +116,6 @@ services:
       - net-selenium
 
 volumes:
-  db-data-selenium:
-    name: airport-db-data-selenium
   api-app-selenium:
     name: airport-api-app-selenium
   web-app-selenium:
