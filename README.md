@@ -10,7 +10,7 @@
 
 ## Overview
 
-This project contains an API for managing a PostgreSQL database, a web interface for seeing available flights and their prices, and a desktop application that provides a graphical interface for managing the database trough API.
+This project contains an API for managing a PostgreSQL database, a web interface for seeing available flights and their prices, and a desktop application that provides a graphical interface for managing the database trough an API.
 
 ## Database API
 
@@ -28,6 +28,8 @@ The desktop's purpose is to make adding, updating and removing entries from the 
 
 It is made using the [Windows Presentation Foundation](https://github.com/dotnet/wpf) framework and is only available for windows machines.
 
+Check the [user manual](./AirportManagement/docs/desktop-app-manual.md) for help.
+
 ## Getting started
 
 The database, API and web server can be run using [docker compose](https://github.com/docker/compose) and the [compose.yml](./compose.yml) compose file.
@@ -41,10 +43,10 @@ Local ports used by the services:
 
 ## Testing
 
-The tests can be run using [docker compose](https://github.com/docker/compose) and the appropriate compose file.
+The tests can be run using [docker compose](https://github.com/docker/compose) and the appropriate compose file. Hoverver it is advised to use the shell scripts instead.
 
-To run the API tests run the `docker compose -f compose.test-api.yml up` command or the [test-api.sh](./test-api.sh) script.
+| Test | Compose File | Shell Script | Latest Results |
+| --- | --- | --- | --- |
+| API tests | [compose.test-api.yml](./compose.test-api.yml) | [test-api.sh](./test-api.sh) | [view](./AirportManagement/api-test-results.md) |
+| Selenium tests | [compose.test-web.yml](./compose.test-web.yml) | [test-web.sh](./test-web.sh) | [view](./AirportWebTest/web-selenium-test-results.md) |
 
-The last test results for the API can be found [here](./AirportManagement/api-test-results.md).
-
-To run the Selenium tests of the web interface run the `docker compose -f compose.test-api.yml up` command.
