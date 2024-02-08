@@ -46,7 +46,7 @@ public class SeleniumTests
         _webDriver.FindElement(By.CssSelector("a[href='/summary']")).Click();
         Assert.AreEqual("Airlines | Summary", _webDriver.Title);
     }
-/*
+
     [TestMethod]
     public void TestLightDarkSwitchIsWorking()
     {
@@ -497,5 +497,5 @@ public class SeleniumTests
         using var doc = JsonDocument.Parse(responseContent);
         
         return doc.RootElement.GetProperty("distance").GetInt32();
-    }*/
+    }
 }
