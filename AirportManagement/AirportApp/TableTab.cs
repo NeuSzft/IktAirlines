@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,7 +15,6 @@ internal sealed class Functions<T> {
     public Func<int, T, Task>? Put { get; set; }
     public Func<int, Task>? Delete { get; set; }
     public Func<Task<int>>? NextId { get; set; }
-    public Func<IEnumerable<OperationInfo>, Task<RequestResult>>? Modify { get; set; }
 }
 
 internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
@@ -62,7 +59,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
         _deleteButton.Click += (_, _) => DeleteItems();
         _undoAllButton.Click += (_, _) => ResetItems();
         _showChangesButton.Click += (_, _) => ShowChanges();
-        _updateButton.Click += (_, _) => _ = UpdateRemoteItems(); // SendOperations()
+        _updateButton.Click += (_, _) => _ = UpdateRemoteItems();
         _fetchButton.Click += (_, _) => _ = FetchRemoteItems();
         Grid.SelectedCellsChanged += (_, _) => SelectionChanged();
         Grid.ItemList.CollectionChanged += (_, _) => SetItemCount();
@@ -175,27 +172,6 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
 
         if (exceptions.Count > 0)
             new ErrorsWindow(exceptions).ShowDialog();
-    }
-
-    private async Task SendOperations() {
-        _updateResult.Text = "Updating...";
-
-        IEnumerable<Operation> added = Grid.Changes.AddedItems.Select(x => new AddOperation<T>(x));
-        IEnumerable<Operation> updated = Grid.Changes.UpdatedItems.Select(x => new UpdateOperation<T>(x.Id, x));
-        IEnumerable<Operation> removed = Grid.Changes.RemovedItems.Select(x => new RemoveOperation<T>(x.Id));
-        IEnumerable<Operation> operations = added.Concat(updated).Concat(removed);
-
-        if (Functions.Modify is null)
-            return;
-        var result = await Functions.Modify(operations.Select(x => x.GetInfo()));
-        string message = Regex.Unescape(result.Message);
-
-        _updateResult.Text = message.Split('\n', '\r').FirstOrDefault() ?? message;
-
-        if (result.Status == HttpStatusCode.OK)
-            await FillDataGrids();
-        else
-            MessageBox.Show($"{(int)result.Status}: {result.Status}\n\n{message}", "Failed to update database", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     private async Task<bool> FetchRemoteItems() {

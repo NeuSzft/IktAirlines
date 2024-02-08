@@ -30,8 +30,6 @@
 | GET | [/next-id/airlines](#get-next-idairlines) | Get the next available id for an airline. |
 | GET | [/next-id/cities](#get-next-idcities) | Get the next available id for a city. |
 | GET | [/next-id/flights](#get-next-idflights) | Get the next available id for a flight. |
-| PATCH | [/modify](#patch-modify) | Perform all operations within a single transaction. |
-| PATCH | [/modify/test](#patch-modifytest) | Perform all operations within a single transaction then rollback. |
 
 ## Schemas Table
 
@@ -41,8 +39,6 @@
 | [City](#city-model) | [City.cs](AirportAPI.Models/City.cs) |
 | [Flight](#flight-model) | [Flight.cs](AirportAPI.Models/Flight.cs) |
 | [FlightJoined](#flightjoined-model) | [FlightJoined.cs](AirportAPI.Models/FlightJoined.cs) |
-| [ModificationResults](#modificationresults-model) | [ModificationResults.cs](AirportAPI.Models/ModificationResults.cs) |
-| [OperationInfo](#operationinfo-model) | [Operations.cs](AirportAPI.Models/Operations.cs) |
 | [Ticket](#ticket-model) | [Ticket.cs](AirportAPI.Models/Ticket.cs) |
 
 ### `POST` /airlines
@@ -416,84 +412,6 @@ int32 number as a plain text string
 ```
 - 404 Not Found
 
-***
-
-### `PATCH` /modify
-> Perform all operations within a single transaction.
-
-#### RequestBody
-- application/json
-
-```ts
-{
-  operation_name: string
-  model_name: string
-  id?: integer
-}[]
-```
-
-#### Responses
-- 200 OK
-`text/plain`
-```
-plain text error message
-```
-- 400 Bad Request
-- 422 Unprocessable Entity
-`text/plain`
-```
-plain text error message
-```
-
-***
-
-### `PATCH` /modify/test
-> Perform all operations within a single transaction then rollback.
-> Returns the number of rows affected and the airlines, cities and flights tables in their pre-rollback state.
-
-#### RequestBody
-- application/json
-```ts
-{
-  operation_name: string
-  model_name: string
-  id?: integer
-}[]
-```
-
-#### Responses
-- 200 OK
-`application/json`
-```ts
-{
-  rows_affected: integer
-  airlines: {
-    id?: integer
-    name: string
-  }[]
-  cities: {
-    id?: integer
-    name: string
-    population: integer
-  }[]
-  flights: {
-    id?: integer
-    airline_id: integer
-    origin_id: integer
-    destination_id: integer
-    distance: integer
-    flight_time: integer
-    huf_per_km: integer
-  }[]
-}
-```
-- 400 Bad Request
-- 422 Unprocessable Entity
-`text/plain`
-```
-plain text error message
-```
-
 ## Schemas
 
 ### Airline Model
@@ -542,43 +460,6 @@ plain text error message
   distance: integer
   flight_time: integer
   huf_per_km: integer
-}
-```
-
-### ModificationResults Model
-
-```ts
-{
-  rows_affected: integer
-  airlines: {
-    id?: integer
-    name: string
-  }[]
-  cities: {
-    id?: integer
-    name: string
-    population: integer
-  }[]
-  flights: {
-    id?: integer
-    airline_id: integer
-    origin_id: integer
-    destination_id: integer
-    distance: integer
-    flight_time: integer
-    huf_per_km: integer
-  }[]
-}
-```
-
-### OperationInfo Model
-
-```ts
-{
-  operation_name: string
-  model_name: string
-  id?: integer
-  item?: object
 }
 ```
 
