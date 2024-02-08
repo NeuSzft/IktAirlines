@@ -49,4 +49,3 @@ The tests can be run using [docker compose](https://github.com/docker/compose) a
 | --- | --- | --- | --- |
 | API tests | [compose.test-api.yml](./compose.test-api.yml) | [test-api.sh](./test-api.sh) | [view](./AirportManagement/api-test-results.md) |
 | Selenium tests | [compose.test-web.yml](./compose.test-web.yml) | [test-web.sh](./test-web.sh) | [view](./AirportWebTest/web-selenium-test-results.md) |
-

@@ -21,28 +21,28 @@ To check connectivity with the API and query all tables specify the address of t
 ***
 
 ### Successful Connection
-![Home Tab - Success](app-home-success.png)
+![Home Tab - Success](./app-home-success.png)
 
 A successful connection is indicated by the status message and the green color of the textbox.
 
 ***
 
 ### Connection Failure
-![alt text](app-home-failure.png)
+![Home Tab - Failure](./app-home-failure.png)
 
 A successful connection is indicated by the error message and the red color of the textbox.
 
 ***
 
 ### Tabs
-![alt text](app-tabs.png)
+![Tabs](./app-tabs.png)
 
 The tabs at the top of the window can be used to navigate between the `Home` and the three table tabs.
 
 ***
 
 ### Table Tab Buttons
-![alt text](app-table-buttons.png)
+![Table Tab Buttons](./app-table-buttons.png)
 
 1. Delete selected Items.
 2. Reset changes back to the state of the last fetch.
@@ -55,7 +55,7 @@ When resetting changes the local table always takes up the values that the datab
 ***
 
 ### Table Changes
-![alt text](app-table-changes.png)
+![Table Changes](./app-table-changes.png)
 
 The background of the rows indicates different operations.
 | Color | Operation |
@@ -68,7 +68,7 @@ The background of the rows indicates different operations.
 
 ### Successful Operations
 
-![alt text](app-table-success.png)
+![Successful Operations](./app-table-success.png)
 
 As we can see, after the operations are performed the results of are displayed right next to the commit/upload button. After this the table is fetched again from the database so we can confirm that all three operations were indeed successful.
 
@@ -76,13 +76,13 @@ As we can see, after the operations are performed the results of are displayed r
 
 ### Unsuccessful Operations
 
-![alt text](app-table-failure.png)
+![Unsuccessful Operations](./app-table-failure.png)
 
 If one or more operations fail, we get an error popup that details what went wrong. Unsuccessful operations are preserved even after the table is fetched again, but can be discarded by using the reset button.
 
 ***
 
 ### Table Changes Summary
-![alt text](app-table-summary.png)
+![Table Changes Summary](./app-table-summary.png)
 
 The show pending changes button can give a helpful summary of all the changes that would be performed when dealing with a large amount of operations.
