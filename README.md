@@ -10,7 +10,7 @@
 
 ## Overview
 
-This project contains an API for managing a PostgreSQL database, a web interface for seeing available flights and their prices, and a desktop application that provides a graphical interface for managing the database trough an API.
+This project contains an API for managing a PostgreSQL database, a web interface for seeing available flights and their prices, and a desktop application that provides a graphical interface for managing the database trough the API.
 
 ## Database API
 
@@ -24,7 +24,7 @@ List of available [endpoints](./AirportManagement/docs/endpoints.md).
 
 ## Desktop Application
 
-The desktop's purpose is to make adding, updating and removing entries from the database a simple task.
+The desktop application's purpose is to make adding, updating and removing entries from the database a simple task.
 
 It is made using the [Windows Presentation Foundation](https://github.com/dotnet/wpf) framework and is only available for windows machines.
 
