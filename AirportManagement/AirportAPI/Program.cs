@@ -1,11 +1,13 @@
 using AirportAPI.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
+using System.Text;
 
 namespace AirportAPI;
 
@@ -33,22 +35,41 @@ internal static class Program {
 
         builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton(_ => connection);
+        builder.Services.AddSwaggerGen(options => {
+            options.SupportNonNullableReferenceTypes();
+            options.SwaggerDoc("api", new() {
+                Title = "Airlines Management API",
+                Version = "1.0.0"
+            });
+        });
 
         WebApplication app = builder.Build();
+
+        app.Logger.LogInformation(Environment.GetEnvironmentVariable(ConStrEnv));
 
         app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetIsOriginAllowed(_ => true));
 
         if (app.Environment.IsDevelopment()) {
-            app.UseSwagger(options => options.RouteTemplate = "/docs/{documentName}/swagger.json");
+            app.UseSwagger(options => options.RouteTemplate = "/docs/{documentName}/endpoints.json");
             app.UseSwaggerUI(options => {
-                options.SwaggerEndpoint("/docs/v1/swagger.json", "Airport API");
+                options.SwaggerEndpoint("/docs/api/endpoints.json", "API Endpoints");
                 options.RoutePrefix = "docs";
             });
         }
 
-        app.Logger.LogInformation(Environment.GetEnvironmentVariable(ConStrEnv));
+        app.Use(async (context, next) => {
+            try {
+                await next(context);
+            } catch (NpgsqlException exception) {
+                context.Response.Clear();
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                context.Response.ContentType = "text/plain";
+                await context.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(exception.Message));
+            }
+        });
+
+        app.UseRouting();
 
         app.MapFlights();
         app.MapCities();

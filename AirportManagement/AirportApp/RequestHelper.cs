@@ -1,9 +1,11 @@
 ﻿using AirportAPI.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -12,54 +14,46 @@ namespace AirportApp;
 internal sealed record RequestResult(HttpStatusCode Status, string Message);
 
 internal sealed class RequestHelper(string baseAddress) : IDisposable {
+    public class ResponseException(string message) : Exception {
+        public override string Message => message;
+    }
+
     public Uri BaseAddress => _client.BaseAddress!;
 
     private HttpClient _client = new() { BaseAddress = new(baseAddress) };
 
     public async Task<IEnumerable<T>?> Get<T>(string path) {
-        try {
-            return await _client.GetFromJsonAsync<IEnumerable<T>>(path);
-        } catch (Exception e) {
-            ShowRequestError("GET", path, e);
-            return null;
-        }
+        HttpResponseMessage response = await _client.GetAsync(path);
+        if (!response.IsSuccessStatusCode)
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
+        using Stream stream = await response.Content.ReadAsStreamAsync();
+        return JsonSerializer.Deserialize<IEnumerable<T>>(stream);
     }
 
-    public async Task<bool> Post<T>(string path, T obj) {
-        try {
-            return (await _client.PostAsJsonAsync(path, obj)).IsSuccessStatusCode;
-        } catch (Exception e) {
-            ShowRequestError("POST", path, e);
-            return false;
-        }
+    public async Task Post<T>(string path, T obj) {
+        HttpResponseMessage response = await _client.PostAsJsonAsync(path, obj);
+        if (!response.IsSuccessStatusCode)
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
     }
 
-    public async Task<bool> Put<T>(string path, T obj) {
-        try {
-            return (await _client.PutAsJsonAsync(path, obj)).IsSuccessStatusCode;
-        } catch (Exception e) {
-            ShowRequestError("PUT", path, e);
-            return false;
-        }
+    public async Task Put<T>(string path, T obj) {
+        HttpResponseMessage response = await _client.PutAsJsonAsync(path, obj);
+        if (!response.IsSuccessStatusCode)
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
     }
 
-    public async Task<bool> Delete(string path) {
-        try {
-            return (await _client.DeleteAsync(path)).IsSuccessStatusCode;
-        } catch (Exception e) {
-            ShowRequestError("DELETE", path, e);
-            return false;
-        }
+    public async Task Delete(string path) {
+        HttpResponseMessage response = await _client.DeleteAsync(path);
+        if (!response.IsSuccessStatusCode)
+            throw new ResponseException(await response.Content.ReadAsStringAsync());
     }
 
-    public async Task<int?> NextId(string path) {
-        try {
-            string value = await _client.GetStringAsync(path);
-            return int.Parse(value);
-        } catch (Exception e) {
-            ShowRequestError("GET", path, e);
-            return null;
-        }
+    public async Task<int> NextId(string path) {
+        HttpResponseMessage response = await _client.GetAsync(path);
+        string content = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+            throw new ResponseException(content);
+        return int.Parse(content);
     }
 
     public async Task<bool> Ping() {

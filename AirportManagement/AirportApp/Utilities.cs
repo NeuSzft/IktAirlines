@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using AirportAPI.Models;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -40,6 +44,15 @@ internal static class Utilities {
             borderFactory.AddHandler(FrameworkElement.LoadedEvent, onLoaded);
 
         return borderFactory;
+    }
+
+    public static void ShowErrorMessageBox(Exception exception, string? title = null) {
+        MessageBox.Show(exception.ToString(), title ?? exception.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    public static void CopyTo<T>(this T original, T other) where T : IdModel {
+        foreach (PropertyInfo info in typeof(T).GetProperties().Where(x => x.Name != "Id"))
+            info.SetValue(other, info.GetValue(original));
     }
 
     public static SolidColorBrush AdjustAlpha(this SolidColorBrush brush, double multiplier) {

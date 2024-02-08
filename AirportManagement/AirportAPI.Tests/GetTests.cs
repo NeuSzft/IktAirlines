@@ -2,15 +2,13 @@ namespace AirportAPI.Tests;
 
 [TestClass]
 public class GetTests {
-    private const string ApiAddressEnv = "API_ADDRESS";
-
     private HttpClient _client = null!;
 
     [TestInitialize]
-    public void Initialize() => _client = new() { BaseAddress = new($"http://{Environment.GetEnvironmentVariable(ApiAddressEnv) ?? "localhost"}:5000") };
+    public void Initialize() => _client = Utilities.Initialize();
 
     [TestCleanup]
-    public void Cleanup() => _client?.Dispose();
+    public void Cleanup() => Utilities.Cleanup(_client);
 
     [TestMethod]
     public async Task GetAllAirlines() {
@@ -105,5 +103,19 @@ public class GetTests {
         Assert.AreEqual(id * 300, flight.Distance);
         Assert.AreEqual(id * 30, flight.FlightTime);
         Assert.AreEqual(id * 3, flight.HufPerKm);
+    }
+
+    [TestMethod]
+    [DataRow("/airlines/17"), DataRow("/cities/17"), DataRow("/flights/17"), DataRow("/flights/17/joined")]
+    public async Task GetNonExistentItems(string path) {
+        var response = await _client.GetAsync(path);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [TestMethod]
+    [DataRow("/airline"), DataRow("/city"), DataRow("/flight")]
+    public async Task GetWrongPath(string path) {
+        var response = await _client.GetAsync(path);
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

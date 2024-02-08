@@ -89,18 +89,6 @@ internal sealed class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> 
     public new IEnumerable ItemsSource => base.ItemsSource;
 
     public CustomGrid() {
-        ItemList.CollectionChanged += (_, e) => {
-            if (e.NewItems is not null)
-                foreach (T item in e.NewItems.OfType<T>())
-                    Changes.AddedItems.Add(item);
-
-            if (e.OldItems is not null)
-                foreach (T item in e.OldItems.OfType<T>())
-                    Changes.RemovedItems.Add(item);
-
-            Changes.Cleanup();
-        };
-
         AutoGenerateColumns = false;
         CanUserDeleteRows = false;
         CanUserResizeRows = false;
@@ -126,6 +114,9 @@ internal sealed class CustomGrid<T> : DataGrid where T : IdModel, IEquatable<T> 
         T item = Activator.CreateInstance<T>();
         item.Id = NextItemId++;
         e.NewItem = item;
+
+        Changes.AddedItems.Add(item);
+        Changes.Cleanup();
 
         base.OnAddingNewItem(e);
     }

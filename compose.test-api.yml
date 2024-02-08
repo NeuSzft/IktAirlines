@@ -1,7 +1,7 @@
 services:
   test-db:
     container_name: airport-test-db
-    image: postgres:latest
+    image: postgres:15
     volumes:
       - ./initdb-test.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
     networks:
@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
-        COPY ./Airport/AirportAPI /build/AirportAPI
-        COPY ./Airport/AirportAPI.Models /build/AirportAPI.Models
+        COPY ./AirportManagement/AirportAPI /build/AirportAPI
+        COPY ./AirportManagement/AirportAPI.Models /build/AirportAPI.Models
         WORKDIR /build/AirportAPI
         ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
     volumes:
@@ -49,17 +49,25 @@ services:
       context: .
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
-        COPY ./Airport/AirportAPI.Tests /app/AirportAPI.Tests
-        COPY ./Airport/AirportAPI.Models /app/AirportAPI.Models
+        RUN apt update
+        RUN apt install postgresql-client-15 -y
+        COPY ./AirportManagement/AirportAPI.Tests /app/AirportAPI.Tests
+        COPY ./AirportManagement/AirportAPI.Models /app/AirportAPI.Models
         WORKDIR /app/AirportAPI.Tests
-        ENTRYPOINT [ "dotnet", "test" ]
+        ENTRYPOINT [ "dotnet", "test", "-l", "trx;LogFileName=/app/results/api.trx" ]
     depends_on:
       test-api:
         condition: service_started
+    volumes:
+      - ./TestResults:/app/results
     networks:
       - test-net
     environment:
       API_ADDRESS: test-api
+      DB_HOST: test-db
+      DB_NAME: airport
+      DB_USER: postgres
+      PGPASSWORD: postgres
 
 volumes:
   test-api-app:

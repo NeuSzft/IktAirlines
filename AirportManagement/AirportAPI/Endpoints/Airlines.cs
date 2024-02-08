@@ -62,7 +62,7 @@ public static class Airlines {
             using NpgsqlConnection connection = db.Open();
             return Results.Ok(connection.GetAirlines());
         })
-        .WithDescription("Get all airlines.")
+        .WithSummary("Get all airlines.")
         .WithTags("Airlines Endpoints")
         .WithOpenApi()
         .Produces<IEnumerable<Models.Airline>>(StatusCodes.Status200OK, "application/json");
@@ -72,7 +72,7 @@ public static class Airlines {
             var item = connection.GetAirline(id);
             return item is null ? Results.NotFound() : Results.Ok(item);
         })
-        .WithDescription("Get an airline by id.")
+        .WithSummary("Get an airline by id.")
         .WithTags("Airlines Endpoints")
         .WithOpenApi()
         .Produces<Models.Airline?>(StatusCodes.Status200OK, "application/json")
@@ -82,7 +82,7 @@ public static class Airlines {
             using NpgsqlConnection connection = db.Open();
             return connection.PostAirline(airline) > 0 ? Results.Created() : Results.BadRequest();
         })
-        .WithDescription("Add a new airline.")
+        .WithSummary("Add a new airline.")
         .WithTags("Airlines Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status201Created)
@@ -92,7 +92,7 @@ public static class Airlines {
             using NpgsqlConnection connection = db.Open();
             return connection.PutAirline(id, airline) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithDescription("Overwrite an existing airline.")
+        .WithSummary("Overwrite an existing airline.")
         .WithTags("Airlines Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
@@ -103,10 +103,11 @@ public static class Airlines {
             using NpgsqlConnection connection = db.Open();
             return connection.DelAirline(id) > 0 ? Results.Ok() : Results.NotFound();
         })
-        .WithDescription("Delete an existing airline.")
+        .WithSummary("Delete an existing airline.")
         .WithTags("Airlines Endpoints")
         .WithOpenApi()
         .Produces(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);
     }
 }

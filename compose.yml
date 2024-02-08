@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     container_name: airport-db
-    image: postgres:latest
+    image: postgres:15
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
       - db-data:/var/lib/postgresql/data
@@ -20,8 +20,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM mcr.microsoft.com/dotnet/sdk:8.0
-        COPY ./Airport/AirportAPI /build/AirportAPI
-        COPY ./Airport/AirportAPI.Models /build/AirportAPI.Models
+        COPY ./AirportManagement/AirportAPI /build/AirportAPI
+        COPY ./AirportManagement/AirportAPI.Models /build/AirportAPI.Models
         WORKDIR /build/AirportAPI
         ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
     volumes:

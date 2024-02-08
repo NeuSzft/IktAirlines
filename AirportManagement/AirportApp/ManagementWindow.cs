@@ -1,5 +1,4 @@
-using AirportAPI.Models;
-using System;
+﻿using AirportAPI.Models;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,8 +8,8 @@ using System.Windows.Shell;
 
 namespace AirportApp;
 
-internal sealed class Wnd : Window {
-    public Wnd() {
+internal sealed class ManagementWindow : Window {
+    public ManagementWindow() {
         RequestHelper helper = new("http://localhost:5000");
 
         TableTab<Airline> airlinesTab = new(
@@ -73,7 +72,7 @@ internal sealed class Wnd : Window {
 
         HomeTab homeTab = new(helper, airlinesTab.FillDataGrids, citiesTab.FillDataGrids, flightsTab.FillDataGrids);
 
-        TabControl content = new();
+        TabControl content = new() { SelectedItem = homeTab };
         content.SelectionChanged += (_, _) => {
             foreach (Border border in content.Items.OfType<TabItem>().Select(x => x.Header).OfType<Border>()) {
                 bool selected = border.Equals((content.SelectedItem as TabItem)?.Header);
@@ -104,9 +103,4 @@ internal sealed class Wnd : Window {
             CaptionHeight = 32
         });
     }
-}
-
-internal static class Program {
-    [STAThread]
-    private static void Main() => new Application().Run(new Wnd());
 }

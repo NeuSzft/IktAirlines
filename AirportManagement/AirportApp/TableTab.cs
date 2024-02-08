@@ -13,10 +13,10 @@ namespace AirportApp;
 
 internal sealed class Functions<T> {
     public Func<Task<IEnumerable<T>?>>? Get { get; set; }
-    public Func<T, Task<bool>>? Post { get; set; }
-    public Func<int, T, Task<bool>>? Put { get; set; }
-    public Func<int, Task<bool>>? Delete { get; set; }
-    public Func<Task<int?>>? NextId { get; set; }
+    public Func<T, Task>? Post { get; set; }
+    public Func<int, T, Task>? Put { get; set; }
+    public Func<int, Task>? Delete { get; set; }
+    public Func<Task<int>>? NextId { get; set; }
     public Func<IEnumerable<OperationInfo>, Task<RequestResult>>? Modify { get; set; }
 }
 
@@ -62,7 +62,7 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
         _deleteButton.Click += (_, _) => DeleteItems();
         _undoAllButton.Click += (_, _) => ResetItems();
         _showChangesButton.Click += (_, _) => ShowChanges();
-        _updateButton.Click += (_, _) => _ = UpdateRemoteItems();
+        _updateButton.Click += (_, _) => _ = UpdateRemoteItems(); // SendOperations()
         _fetchButton.Click += (_, _) => _ = FetchRemoteItems();
         Grid.SelectedCellsChanged += (_, _) => SelectionChanged();
         Grid.ItemList.CollectionChanged += (_, _) => SetItemCount();
@@ -89,11 +89,12 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     }
 
     private void ResetItems() {
-        Grid.NextItemId = Grid.RemoteNextItemId;
         Grid.ItemList.Clear();
+        Grid.Changes.Clear();
+        Grid.NextItemId = Grid.RemoteNextItemId;
+
         foreach (T item in FetchedData)
             Grid.ItemList.Add((T)item.Clone());
-        Grid.Changes.Clear();
         SetItemCount();
     }
 
@@ -111,6 +112,72 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
     }
 
     private async Task UpdateRemoteItems() {
+        _updateResult.Text = "Updating...";
+
+        int successCount = 0;
+        List<Exception> exceptions = new();
+        List<T> failedAddedItems = new();
+        List<T> failedUpdatedItems = new();
+        List<T> failedRemovedItems = new();
+
+        if (Functions.Post is not null)
+            foreach (T item in Grid.Changes.AddedItems)
+                try {
+                    await Functions.Post(item);
+                    successCount++;
+                } catch (Exception e) {
+                    failedAddedItems.Add(item);
+                    exceptions.Add(e);
+                }
+
+        if (Functions.Put is not null)
+            foreach (T item in Grid.Changes.UpdatedItems)
+                try {
+                    await Functions.Put(item.Id, item);
+                    successCount++;
+                } catch (Exception e) {
+                    failedUpdatedItems.Add(item);
+                    exceptions.Add(e);
+                }
+
+        if (Functions.Delete is not null)
+            foreach (T item in Grid.Changes.RemovedItems)
+                try {
+                    await Functions.Delete(item.Id);
+                    successCount++;
+                } catch (Exception e) {
+                    failedRemovedItems.Add(item);
+                    exceptions.Add(e);
+                }
+
+        _updateResult.Text = $"{successCount}/{Grid.Changes.Count} operations successfully performed";
+
+        await FillDataGrids();
+
+        foreach (T failed in failedAddedItems) {
+            Grid.ItemList.Add(failed);
+            Grid.Changes.AddedItems.Add(failed);
+        }
+
+        foreach (T failed in failedUpdatedItems) {
+            foreach (T item in Grid.ItemList.Where(x => x.Id == failed.Id)) {
+                failed.CopyTo(item);
+                Grid.Changes.UpdatedItems.Add(item);
+            }
+        }
+
+        foreach (T failed in failedRemovedItems) {
+            foreach (T item in Grid.ItemList.Where(x => x.Id == failed.Id))
+                Grid.Changes.RemovedItems.Add(item);
+        }
+
+        Grid.InvalidateVisual();
+
+        if (exceptions.Count > 0)
+            new ErrorsWindow(exceptions).ShowDialog();
+    }
+
+    private async Task SendOperations() {
         _updateResult.Text = "Updating...";
 
         IEnumerable<Operation> added = Grid.Changes.AddedItems.Select(x => new AddOperation<T>(x));
@@ -135,10 +202,21 @@ internal sealed class TableTab<T> : TabItem where T : IdModel, IEquatable<T> {
         _fetchResult.Text = "Fetching...";
 
         if (Functions.NextId is not null)
-            Grid.RemoteNextItemId = await Functions.NextId() ?? 0;
+            try {
+                Grid.RemoteNextItemId = await Functions.NextId();
+            } catch (Exception e) {
+                Grid.RemoteNextItemId = 0;
+                Utilities.ShowErrorMessageBox(e);
+            }
 
         if (Functions.Get is not null) {
-            IEnumerable<T>? data = await Functions.Get();
+            IEnumerable<T>? data = null;
+            try {
+                data = await Functions.Get();
+            } catch (Exception e) {
+                Utilities.ShowErrorMessageBox(e);
+            }
+
             if (data is not null) {
                 _fetchResult.Text = $"Last fetched at {DateTime.Now.ToLongTimeString()}";
                 FetchedData = new(data);
