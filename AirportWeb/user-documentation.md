@@ -25,7 +25,7 @@ Here, you can enter your flight details:
 - **Children count**: Input the number of children, must be greater than **0**.
 - **Tickets**: After entering your travel details, a list of available flights along with prices will be displayed. The flights might contain up to **2** transfers.
 - **Total cost**: In the top right corner of every ticket there will be the cost of all transfers and the final price of the ticket.
-- **Buy button**: In order to book a ticket the number of passengers must be greater than**0. <br>
+- **Buy button**: In order to book a ticket the number of passengers must be greater than **0**. <br>
 After pressing the button and the booking was a success a green alert will appear which contains the confirmation and a link which will redirect to the **Summary Page**. <br>
 It will desappear after **5** seconds.
 
@@ -36,13 +36,13 @@ This section gives you a summary of your purchased ticket details:
 - **Closed Summary**: If the summary section is collapsed, you can expand it with a button on the right side of the flight to view all details by clicking on it.
 - **Opened Summary**: If the summary section is opened, you can review the the details of your flight, including the transfers. Each transfer will include its price,
   - **Airline**
-  - **Origin** and **Destination**,
+  - **Origin** and **Destination**
   - **Distance**
   - **Price/km**
   - **Passenger count**
   - **Price**
 
-At the bottom you will see
+At the bottom you will see:
   - **Total Distance**
   - **Total Flight Time**
   - **Total Price**
