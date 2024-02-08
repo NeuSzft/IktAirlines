@@ -15,6 +15,9 @@ public class DeleteTests {
     public async Task DeleteAirline(int id) {
         var response = await _client.DeleteAsync($"/airlines/{id}");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        response = await _client.GetAsync($"/airlines/{id}");
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [TestMethod]
@@ -22,6 +25,9 @@ public class DeleteTests {
     public async Task DeleteCity(int id) {
         var response = await _client.DeleteAsync($"/cities/{id}");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        response = await _client.GetAsync($"/cities/{id}");
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [TestMethod]
@@ -29,6 +35,9 @@ public class DeleteTests {
     public async Task DeleteFlight(int id) {
         var response = await _client.DeleteAsync($"/flights/{id}");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        response = await _client.GetAsync($"/flights/{id}");
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [TestMethod]
@@ -36,6 +45,9 @@ public class DeleteTests {
     public async Task FailToDeleteAirline(int id) {
         var response = await _client.DeleteAsync($"/airlines/{id}");
         Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+
+        response = await _client.GetAsync($"/airlines/{id}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
 
     [TestMethod]
@@ -43,6 +55,9 @@ public class DeleteTests {
     public async Task FailToDeleteCity(int id) {
         var response = await _client.DeleteAsync($"/cities/{id}");
         Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+
+        response = await _client.GetAsync($"/cities/{id}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
 
     [TestMethod]
