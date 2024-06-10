@@ -1,5 +1,8 @@
 # :airplane: Airlines Management Project
 
+[<img src="https://trello.com/favicon.ico" width="12"/> Trello](https://trello.com/b/dmFaW9eT/iktairlines)\
+[<img src="https://static.figma.com/app/icon/1/favicon.svg" width="12"/> Figma](https://www.figma.com/design/m6DMnSU3LX5Ax3IFF2Gs4B/Airlines?node-id=0-1&t=AlGC7EdEvBNXLnfR-0)
+
 ### Table of Contents
 - [Overview](#overview)
 - [Database API](#database-api)
